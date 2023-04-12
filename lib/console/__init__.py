@@ -7,7 +7,7 @@ class _bright:
     Cyan    : str = "\u001b[36;1m"
     White   : str = "\u001b[37;1m"
 
-class _color(_normalcolors):   
+class _color:   
     Black          : str = "\u001b[30m"
     Red            : str = "\u001b[31m"
     Green          : str = "\u001b[32m"
