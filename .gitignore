@@ -65,7 +65,7 @@ instance/*.db
 .webassets-cache
 
 instance/plugins/*
-!instance/plugins/sample-plugin
+config.yaml
 
 # Scrapy stuff:
 .scrapy
