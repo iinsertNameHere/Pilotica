@@ -7,7 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 from .service import service, serviceConf
 from .database import db
 from .config import Config
-from .plugins.pluginUtils import PluginManager, Plugin
+from .plugin.utils import PluginManager, Plugin
 import pplib.transport as tp
 
 plugin_manager = PluginManager()
@@ -25,6 +25,8 @@ def setup_app(name, db_name="pilot.db", secret_key=secrets.token_urlsafe(16)):
     # ensure the instance folder exists
     try:
         os.makedirs(app.instance_path)
+        os.makedirs(os.path.join(app.instance_path, "config"))
+        os.makedirs(os.path.join(app.instance_path, "plugins"))
     except OSError:
         pass
 

@@ -2,6 +2,7 @@ from ..console import Color
 
 # Mixin class decorator
 def Mixin(cls):
+    cls.__mixin_deco__ = True
     cls.Color = Color
 
     def log(self, msg: str):

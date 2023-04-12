@@ -1,5 +1,5 @@
 # Importing mixin super class
-from pplib.plugins.api import *
+from pplib.plugin.api import *
 
 # Importing needed classes, functions and variables
 from base64 import urlsafe_b64encode as base64encode, urlsafe_b64decode as base64decode
