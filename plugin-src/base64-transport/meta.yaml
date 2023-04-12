@@ -1,0 +1,7 @@
+name: "Base64 Transport"
+alias: "base64-transport"
+creator: "postpilot"
+version: '1.0.0'
+description: "A Plugin that that base64 en/de codes all api trafic" 
+mixins:
+  - transport

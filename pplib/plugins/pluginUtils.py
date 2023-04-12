@@ -1,23 +1,30 @@
-from os.path import join as join_path, isfile, isdir, basename
+from os.path import join as join_path, isfile, isdir, basename, abspath, dirname
 from os import chdir
 from zipfile import PyZipFile, ZipFile
 from pathlib import Path
 import sys
 from zipimport import zipimporter
 import yaml
+import inspect
+
+currentdir = dirname(abspath(inspect.getfile(inspect.currentframe())))
+parentdir = dirname(currentdir)
+sys.path.insert(0, parentdir) 
+
+from console import Color
 
 class PluginCompiler:
     def validate(folder: str):        
         if not isdir(folder):
-            print(f"ERROR: {folder} is not a folder!")
+            print(Color.Red+f"ERROR: {folder} is not a folder!"+Color.Reset)
             exit(-1)
 
         if not isfile(join_path(folder, "meta.yaml")):
-            print(f"ERROR: missing medatada: meta.yaml")
+            print(Color.Red+f"ERROR: missing medatada: meta.yaml"+Color.Reset)
             exit(-1)
 
         if not isfile(join_path(folder, "main.py")):
-            print(f"ERROR: missing main file: main.py")
+            print(Color.Red+f"ERROR: missing main file: main.py"+Color.Reset)
             exit(-1)
 
         return True
@@ -35,7 +42,7 @@ class Plugin:
         self.name = plugin_name
 
         if not isfile(self.path):
-            print(f"ERROR: Plugin file missing: {self.path}")
+            print(Color.Red+f"ERROR: Plugin file missing: {self.path}"+Color.Reset)
             exit(-1)
         
         importer = zipimporter(self.path)

@@ -8,6 +8,7 @@ from .service import service, serviceConf
 from .database import db
 from .config import Config
 from .plugins.pluginUtils import PluginManager, Plugin
+import pplib.transport as tp
 
 plugin_manager = PluginManager()
 
@@ -44,6 +45,8 @@ def setup_app(name, db_name="pilot.db", secret_key=secrets.token_urlsafe(16)):
 
     #Init Plugins
     for plugin in config.plugin_list:
-        plugin_manager.add(Plugin(app.instance_path, plugin))
+        plugin_manager.add(Plugin(app.instance_path, plugin["name"], logging=plugin["logging"]))
+
+    tp.plugin_manager = plugin_manager
 
     return app, config

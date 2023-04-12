@@ -65,7 +65,6 @@ instance/*.db
 .webassets-cache
 
 instance/plugins/*
-config.yaml
 
 # Scrapy stuff:
 .scrapy
@@ -129,3 +128,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+config.yaml

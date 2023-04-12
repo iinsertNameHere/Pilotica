@@ -27,7 +27,7 @@ class Mixins():
         """
         global serviceConf
 
-        if self.logging: print(f"PLUGIN: Setting service.online to False")
+        self.log(f"Setting {self.Color.Bright.Magenta}service.online{self.Color.White} to False")
         
         serviceConf["online"] = False
         return True

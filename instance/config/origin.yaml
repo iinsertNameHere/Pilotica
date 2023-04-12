@@ -1,7 +1,8 @@
 pilot:
-  DEBUG: True
+  DEBUG: False
   API_LOGGING: True
 
-# Plugins to use
-# plugins:
-#   - sample-plugin
+# PostPilot Plugins
+plugins:
+  - name: "base64-transport"
+    logging: False

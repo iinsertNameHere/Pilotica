@@ -10,7 +10,7 @@ class Config:
         self.path = file_path
         self.raw = dict()
         self.pilot = dict()
-        self.plugin_list = list()
+        self.plugin_list: list[dict] = list()
 
     def create(self):
         origin = join_path(self.instance_path, 'config', 'origin.yaml')
@@ -48,10 +48,14 @@ class Config:
                 print(f"{Color.Red}::{Color.White} The field pilot.{field[0]} has not the expected type!"+Color.Reset)
                 exit(-1)
 
-        if not "plugins" in self.raw.keys():
-            self.plugin_list = []
-        else:
+        if "plugins" in self.raw.keys():
             self.plugin_list = self.raw["plugins"]
+        
+        for i, plugin in enumerate(self.plugin_list):
+            for key in ["name", "logging"]:
+                if not key in plugin.keys():
+                    print(f"{Color.Red}::{Color.White} plugins[{i}] is missing field: {key}"+Color.Reset)
+                    exit(-1)
 
         
         
