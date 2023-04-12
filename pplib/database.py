@@ -58,7 +58,7 @@ class Agent(db.Model):
         agents = Agent.query.all()
         for agent in agents:
             db.session.delete(agent)
-            
+
         db.session.commit()
 
 class Task(db.Model):

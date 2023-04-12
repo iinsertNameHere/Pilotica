@@ -1,0 +1,10 @@
+name: "Sample Plugin"
+alias: "sample-plugin"
+creator: "normaldev"
+version: '1.0.0'
+description: "Plugin Template for PostPilot" 
+# requirements:
+  # - name: 'PyYAML'
+  #   version: '5.4.3'
+mixins:
+  - core

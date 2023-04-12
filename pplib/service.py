@@ -139,7 +139,7 @@ def deleteAll():
             for agent in agents:
                 dict_repr[str(agent.id)] = {
                     "hostname": agent.hostname,
-                    "beacon": agent.beacon
+                    "beacon": str(agent.beacon)
                 }
             return base64encode(json.dumps(dict_repr).encode()).decode()
     else:

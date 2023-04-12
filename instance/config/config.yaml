@@ -1,0 +1,7 @@
+pilot:
+  DEBUG: True
+  API_LOGGING: True
+
+# Plugins to use
+plugins:
+  - sample-plugin
