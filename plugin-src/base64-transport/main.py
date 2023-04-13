@@ -1,4 +1,4 @@
-# Importing mixin super class
+# Importing plugin api
 from pplib.plugin.api import *
 
 # Importing needed classes, functions and variables
@@ -7,7 +7,7 @@ import pplib.transport as tp
 
 @Mixin
 class Mixins():
-    def transport(self, args: dict = dict()):
+    def transport(self, **kwargs):
         def dump(self):
             return base64encode(self.data.encode()).decode()
         tp.Transport.dump = dump
@@ -20,5 +20,5 @@ class Mixins():
         W = self.Color.White
         self.log(f"{self.meta['alias']}: {M}Transport.dump{W} and {M}Transport.load{W} where overwritten")
 
-        return True
+        return kwargs["data"]
         

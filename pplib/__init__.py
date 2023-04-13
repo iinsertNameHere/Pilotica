@@ -7,7 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 from .service import service, serviceConf
 from .database import db
 from .config import Config
-from .plugin.utils import PluginManager, Plugin
+from .plugin.engine import PluginManager, Plugin
 import pplib.transport as tp
 
 plugin_manager = PluginManager()

@@ -1,4 +1,4 @@
-from pplib.plugin.utils import PluginCompiler
+from pplib.plugin.generation import PluginCompiler
 import sys
 import os
 

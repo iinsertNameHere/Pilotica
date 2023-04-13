@@ -8,12 +8,11 @@ from pplib.service import serviceConf
 # The @Mixin initializes all mixin functionality
 #
 # Each Mixin Function has to have the name of the mixin it wants to access.
-# It also has to have a args (dict) argument where it can get arguments form.
 # 
 # INFO: This class is Required for the Plugin to run
 @Mixin
 class Mixins():
-    def core(self, args = dict()):
+    def core(self, **kwargs):
         """
         Core mixin that is called just befor the Flask App is started
         - return:
