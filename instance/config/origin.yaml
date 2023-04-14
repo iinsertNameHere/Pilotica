@@ -1,8 +1,8 @@
-pilot:
+pilotica:
   DEBUG: False
   API_LOGGING: True
 
-# PostPilot Plugins
+# Pilotica Plugins
 plugins:
   - name: "base64-transport"
     logging: False

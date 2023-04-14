@@ -3,7 +3,7 @@ name: "Sample Plugin"                        # The full name of the Plugin
 alias: "sample-plugin"                       # The code alias of the Plugin
 creator: "sampledev"                         # The name of the creator of the Plugin
 version: '1.0.0'                             # The Plugins Version
-description: "Plugin Template for PostPilot" # A description of the Plugin 
+description: "Plugin Template for Pilotica" # A description of the Plugin 
 mixins:                                      # A list of mixins the Plugin needs to access
   # Core Mixin
   - core

@@ -12,7 +12,7 @@ import pplib.transport as tp
 
 plugin_manager = PluginManager()
 
-def setup_app(name, db_name="pilot.db", secret_key=secrets.token_urlsafe(16)):
+def setup_app(name, db_name="session.db", secret_key=secrets.token_urlsafe(16)):
     # create and configure the app
     app = Flask(name)
     app.config['SECRET_KEY'] = secret_key
@@ -43,7 +43,7 @@ def setup_app(name, db_name="pilot.db", secret_key=secrets.token_urlsafe(16)):
     else:
         config.create()
 
-    serviceConf["logging"] = config.pilot.get("API_LOGGING")
+    serviceConf["logging"] = config.pilotica.get("API_LOGGING")
 
     #Init Plugins
     for plugin in config.plugin_list:
