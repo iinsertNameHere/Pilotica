@@ -1,2 +1,2 @@
-# PostPloit
-A Postexploitation HTTP Command and Control Framework
+# Pilotica
+A Post-Exploitation HTTP Command and Control Framework
