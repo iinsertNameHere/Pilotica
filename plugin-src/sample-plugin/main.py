@@ -1,8 +1,8 @@
 # Importing plugin api
-from pplib.plugin.api import *
+from pilotica.plugin.api import *
 
 # Importing needed classes, functions and variables
-from pplib.service import serviceConf
+from pilotica.service import serviceConf
 
 # Creating a Mixins class that holds all mixin functions
 # The @Mixin initializes all mixin functionality

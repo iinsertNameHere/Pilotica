@@ -1,0 +1,9 @@
+# Plugin Metadata
+name: "Service Testing"
+alias: "service-testing"
+creator: "pilotica" 
+version: '1.0.0'   
+description: "Plugin to test the service module"
+mixins:
+  # service Mixin
+  - service

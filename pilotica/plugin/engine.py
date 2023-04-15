@@ -33,7 +33,8 @@ class PluginManager:
         self.plugins = {
             "all": list(),
             "core": list(),
-            "transport": list()
+            "transport": list(),
+            "service": list()
         }
 
     def add(self, plugin: Plugin):

@@ -26,7 +26,8 @@ def EnableMixins(_globals: dict, mixin_name: str, args: list = list(), returns: 
         for arg in args:
             kwargs.append(f"{arg}={arg}")
      
-        mixin_code = f'{returns}: list = list()\n' + \
+        mixin_code = f'from pilotica.settings import plugin_manager\n' + \
+                     f'{returns}: list = list()\n' + \
                      f'for index in plugin_manager.get("{mixin_name}"):\n' + \
                      f'    {returns}.append(plugin_manager.plugins["all"][index].mixins.{mixin_name}({",".join(kwargs)}))'
 
@@ -39,14 +40,14 @@ def EnableMixins(_globals: dict, mixin_name: str, args: list = list(), returns: 
         func_src.pop(position)
 
         mixin_code_lines = ["    "+line for line in mixin_code.split('\n')]
-        if position <= len(func_src)-1:
+        if position <= len(func_src):
             mixin_code_lines.reverse()
             for line in mixin_code_lines:
                 func_src.insert(position, line)
         else:
             raise ValueError("position index out of range!")
 
-        code = compile('\n'.join(func_src), "mixins_"+func.__name__, "exec")
+        code = compile('\n'.join(func_src), _globals["__file__"], "exec")
 
         exec_globals = _globals
         exec(code, exec_globals)

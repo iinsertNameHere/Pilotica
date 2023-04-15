@@ -1,9 +1,9 @@
 # Importing plugin api
-from pplib.plugin.api import *
+from pilotica.plugin.api import *
 
 # Importing needed classes, functions and variables
 from base64 import urlsafe_b64encode as base64encode, urlsafe_b64decode as base64decode
-import pplib.transport as tp
+import pilotica.transport as tp
 
 @Mixin
 class Mixins():

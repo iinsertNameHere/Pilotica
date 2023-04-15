@@ -32,7 +32,7 @@ class Config:
             print(f"{Color.Red}::{Color.White} Failed to load Config!"+Color.Reset)
             exit(-1)
 
-        not_optional = [("DEBUG", bool), ("API_LOGGING", bool)]
+        not_optional = [("DEBUG", bool), ("API_LOGGING", bool), ("secret_key", str)]
 
         if not "pilotica" in self.raw.keys():
             print(f"{Color.Red}::{Color.White} The field pilotica is not optional!"+Color.Reset)
@@ -52,7 +52,7 @@ class Config:
             self.plugin_list = self.raw["plugins"]
         
         for i, plugin in enumerate(self.plugin_list):
-            for key in ["name", "logging"]:
+            for key in ["alias", "logging"]:
                 if not key in plugin.keys():
                     print(f"{Color.Red}::{Color.White} plugins[{i}] is missing field: {key}"+Color.Reset)
                     exit(-1)

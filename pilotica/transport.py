@@ -1,7 +1,5 @@
 from .plugin.decorators import *
 
-plugin_manager = None
-
 class Transport:
     @EnableMixins(globals(), "transport", args=["data"])
     def __init__(self, data: str):

@@ -1,4 +1,4 @@
-from pplib.plugin.generation import PluginCompiler
+from pilotica.plugin.generation import PluginCompiler
 import sys
 import os
 
