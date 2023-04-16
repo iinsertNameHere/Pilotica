@@ -1,21 +1,26 @@
 # Normal imports
 import os
 import secrets
+import yaml
 
 # Flask imports
 from pilotica.custom_flask import CustomFlask
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash
 
 # Blueprint imports
 from .service import service, init_service, __main__ as __service_main__
 from .webinterface import webinterface
+from .auth import auth
 
 # pilotica imports
-from .database import db
+from .database import db, Pilot
 from .config import Config
+from .console import Color
 from .plugin.engine import PluginManager, Plugin
 
 import pilotica.settings as ps
+import pilotica.pilots as pilots
 
 plugin_manager = PluginManager()
 
@@ -41,6 +46,13 @@ def setup_app(name, db_name="session.db"):
     app.config['SECRET_KEY'] = secret_key
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_name}'
     db.init_app(app)
+    ps.login_manager.init_app(app)
+
+    @ps.login_manager.user_loader
+    def load_user(id):
+        return Pilot.query.get(int(id))
+
+    ps.secret_key = secret_key
 
     with app.app_context():
         db.create_all()
@@ -50,12 +62,39 @@ def setup_app(name, db_name="session.db"):
         os.makedirs(app.instance_path)
         os.makedirs(os.path.join(app.instance_path, "config"))
         os.makedirs(os.path.join(app.instance_path, "plugins"))
+        os.makedirs(os.path.join(app.instance_path, "pilots"))
     except OSError:
         pass
+
+    # create pilots
+    pilots_path  = os.path.join(app.instance_path, 'pilots')
+    for file in os.listdir(pilots_path):
+        if file.endswith(".yaml"):
+            file_path = os.path.join(pilots_path, file)
+            if not pilots.validate(file_path):
+                for error in pilots.pilot_validator.errors:
+                    print(Color.Red+f"ERROR: Failed to validate '{error}' in {file}"+Color.Reset)
+                exit(-1)
+            with open(file_path, 'r') as pilotfile:
+                pilot_dict = yaml.safe_load(pilotfile)
+            with app.app_context():
+                if not Pilot.exists(pilot_dict["name"]):
+                    new_pilot = Pilot(name=pilot_dict["name"],
+                                pwd_hash=generate_password_hash(pilot_dict["password"]),
+                                role=pilot_dict["role"])
+                
+                    db.session.add(new_pilot)
+                    db.session.commit()
+            
+            
+
+            
+
 
     # add blueprints
     app.register_blueprint(service)
     app.register_blueprint(webinterface)
+    app.register_blueprint(auth)
 
     #Init Plugins
     for plugin in config.plugin_list:
@@ -64,6 +103,7 @@ def setup_app(name, db_name="session.db"):
     if len(plugin_manager.plugins["all"]) > 0:
         print()
 
+    # Init Globals
     ps.plugin_manager = plugin_manager
 
     service_conf = {

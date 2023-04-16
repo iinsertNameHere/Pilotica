@@ -1,0 +1,41 @@
+{% extends 'base.html.j2' %}
+
+{% block title %}Pilotica - Pilots{% endblock %}
+
+{% block body %}
+    <div class="container">
+        {% if pilots %}
+            <h3 style="margin-top: 50px; color: white;">Pilots</h3>
+            <table id="pilots_table" class="table table-striped table-dark">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">name</th>
+                        <th scope="col">Role</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pilot in pilots %}
+                        
+                            <tr>
+                                <td>{{ pilot["id"] }}</td>
+                                <td>{{ pilot["name"] }}</td>
+                                <td>{{ pilot["role"] }}</td>
+                                <td>
+                                    <button class="btn btn-secondary"><i class="bi bi-gear-fill"></i></button>
+                                    {% if pilot['id'] != current_pilot.id %}
+                                        <button class="btn btn-danger" onclick="delete_pilot('{{ pilot['id'] }}')"><i class="bi bi-trash fs-6"></i></button>
+                                    {% else %}
+                                        <button class="btn btn-danger disabled"><i class="bi bi-trash fs-6"></i></button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <h3 style="margin-top: 50px; color: white;">No Pilots in database</h3>
+        {% endif %}
+    </div>
+{% endblock %}

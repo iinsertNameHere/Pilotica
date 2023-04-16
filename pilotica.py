@@ -1,6 +1,10 @@
 from pilotica import setup_app, plugin_manager
 from pilotica.plugin.decorators import *
 from pilotica.console import Color
+from flask import send_from_directory
+from pilotica.transport import Transport
+
+from flask import request, redirect, url_for
 
 import os
 
@@ -10,6 +14,20 @@ host = "127.0.0.1"
 port = 4444
 
 app, config = setup_app(__name__)
+
+@app.route("/transport/load", methods = {'GET'})
+def transport_load():
+    data = request.args.get("data")
+    return Transport(data).load()
+
+@app.route("/transport/dump", methods = {'GET'})
+def transport_dump():
+    data = request.args.get("data")
+    return Transport(data).dump()
+
+@app.route("/")
+def index():
+    return redirect(url_for('webinterface.agents'))
 
 @EnableMixins(globals(), "core")
 def main():

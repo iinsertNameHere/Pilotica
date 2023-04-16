@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        <title>{% block title %}{% endblock %}</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.2/css/bootstrap.min.css"/>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat&display=swap">
+        <style>
+            body {
+                font-family: 'Montserrat', monospace;
+            }
+        
+            thead {
+                color: #ff8800;
+            }
+        
+            tbody {
+                color: white
+            }
+        
+            nav {
+                background-color: #141414;
+            }
+
+            button {
+                background-color: #ff8800;
+                color: white;    
+            }
+
+            .alert {
+                position: fixed;
+                top: 0;
+                right: 0;
+                z-index: 9999;
+                width: 100%;
+                max-width: 400px;
+                margin: 1rem;
+            }
+
+            .navbar .nav-text {
+                color: #ff8800;
+                font-weight: 600;
+                margin-right: 10px;
+            }
+
+            .navbar .btn.btn-sm.btn-outline-danger {
+                color: rgba(255,255,255,.55);
+                font-weight: 600;
+                border-color: rgba(255,255,255,.55);
+            }
+
+            .navbar .btn.btn-sm.btn-outline-danger:hover {
+                color: rgba(255,255,255,.75);
+                border-color: rgba(255,255,255,.75);
+                background-color: #141414;
+            }
+
+        </style>
+    </head>
+    <body class=" bg-dark text-white">
+        {% block nav %}
+          <nav class="navbar navbar-expand-lg navbar-dark">
+              <div class="container-fluid">
+                <a class="navbar-logo" style="margin-right: 20px;">
+                  <img src="{{ url_for('static', filename='logo.svg') }}" alt="Pilotica Logo" width="125px">
+                </a>
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav_items">
+                    <a class="nav-link" href="{{ url_for('webinterface.agents') }}">Agents</a>
+                    </li>
+                    <li class="nav-item">
+                    <a class="nav-link" href="#">Builder</a>
+                    </li>
+                    <li class="nav-item">
+                    {% if current_pilot.role == 'ADMIN' %}
+                        <a class="nav-link" href="{{ url_for('webinterface.pilots') }}">Pilots</a>
+                    {% else %}
+                        <a class="nav-link disabled" href="{{ url_for('webinterface.pilots') }}">Pilots</a>
+                    {% endif %}
+                    </li>
+                </ul>
+                <div class="ml-auto"></div>
+                    <span class="nav-text">{{ current_pilot.name }}</span>
+                    <a id="logout-btn" class="btn btn-sm btn-outline-danger" type="button" href="{{ url_for('auth.logout') }}" data-toggle="tooltip" data-placement="bottom" title="Logout">
+                        <i class="bi bi-box-arrow-right"></i>
+                    </a>
+              </div>
+          </nav>
+        {% endblock %}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div id="alert-{{ loop.index }}"class="alert alert-{{ category }} alert-dismissible fade show mb-3" role="alert">
+                        {{ message }}
+                        <button onclick="document.getElementById('alert-{{ loop.index }}').remove()" type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        {% block body %}
+        {% endblock %}
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.2/js/bootstrap.bundle.min.js" integrity="sha512-k8USvflLQakQ1zrfgdGsKZ8xFvZjO+DBufSN6fPpFy8GKj1B7Vyz+rN5Sf7+Z5kiOfX9E2ADah4ukK4wV+Mvzw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script>
+            function closeAllAlerts() {
+                $('.alert').alert('close')
+            }
+
+            class Transport {
+                constructor(data) {
+                    this.data = data
+                }
+
+                load() {
+                    return fetch("{{ url_for('transport_load') }}?data="+this.data, {method: 'GET'}).then(response => response.text())
+                }
+
+                dump() {
+                    return fetch("{{ url_for('transport_dump') }}?data="+this.data, {method: 'GET'}).then(response => response.text())
+                }
+            }
+        </script>
+    </body>
+</html>
