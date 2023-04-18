@@ -67,28 +67,16 @@ def setup_app(name, db_name="session.db"):
         pass
 
     # create pilots
-    pilots_path  = os.path.join(app.instance_path, 'pilots')
-    for file in os.listdir(pilots_path):
-        if file.endswith(".yaml"):
-            file_path = os.path.join(pilots_path, file)
-            if not pilots.validate(file_path):
-                for error in pilots.pilot_validator.errors:
-                    print(Color.Red+f"ERROR: Failed to validate '{error}' in {file}"+Color.Reset)
-                exit(-1)
-            with open(file_path, 'r') as pilotfile:
-                pilot_dict = yaml.safe_load(pilotfile)
-            with app.app_context():
-                if not Pilot.exists(pilot_dict["name"]):
-                    new_pilot = Pilot(name=pilot_dict["name"],
-                                pwd_hash=generate_password_hash(pilot_dict["password"]),
-                                role=pilot_dict["role"])
-                
-                    db.session.add(new_pilot)
-                    db.session.commit()
-            
-            
+    with app.app_context():
+        if not len(Pilot.query.all()) > 0:
+            initial_pilot = Pilot(name="adminpilot", pwd_hash=generate_password_hash("admin"), role='ADMIN')
+            db.session.add(initial_pilot)
+            db.session.commit()
 
-            
+        if not len(Pilot.query.all()) > 1:
+            initial_pilot = Pilot(name="adminpilot2", pwd_hash=generate_password_hash("admin"), role='ADMIN')
+            db.session.add(initial_pilot)
+            db.session.commit()
 
 
     # add blueprints

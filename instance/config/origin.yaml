@@ -5,5 +5,5 @@ pilotica:
 
 # Pilotica Plugins
 plugins:
-  - name: "base64-transport"
+  - alias: "base64-transport"
     logging: False

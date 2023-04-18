@@ -5,7 +5,7 @@
 {% block body %}
     <div class="container">
         {% if agents %}
-            <h3 style="margin-top: 50px; color: white;">Agents</h3>
+            <h3 class="title-text">Agents</h3>
             <table id="agents_table" class="table table-striped table-dark">
                 <thead>
                     <tr>
@@ -27,48 +27,18 @@
                             <td>{{ agent["task_count"] }}</td>
                             <td>
                                 <button class="btn btn-secondary"><i class="bi bi-terminal"></i></button>
-                                <button class="btn btn-danger" onclick="delete_agent('{{ agent['id'] }}')"><i class="bi bi-trash fs-6"></i></button>
+                                <button class="btn btn-danger" onclick="confirm_delete(delete_agent, id='{{ agent['id'] }}')"><i class="bi bi-trash fs-6"></i></button>
                             </td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
-            <button class="btn btn-danger text-white" onclick="delete_all()">Delete All</button>
+            <button class="btn btn-danger text-white" onclick="confirm_delete(delete_all)">Delete All</button>
         {% else %}
-            <h3 style="margin-top: 50px; color: white;">No Agents in database</h3>
+            <h3 class="title-text">No Agents in database</h3>
         {% endif %}
     </div>
-    <script>
-        function delete_agent(id) {
-            fetch("{{ url_for('service.agents') }}?id="+id, {
-                method: 'DELETE',
-                headers: {
-                    'key': 'secret-key',
-                }
-            }).then(response => response.text())
-            .then(data => new Transport(data).load()).then(result => {
-                if (result != "OK") {
-                    alert("Failed!")
-                    return
-                }
-                window.location.href = "{{ url_for('webinterface.agents') }}"
-            });
-        }
 
-        function delete_all() {
-            fetch("{{ url_for('service.agents') }}", {
-                method: 'DELETE',
-                headers: {
-                    'key': 'secret-key',
-                }
-            }).then(response => response.text())
-            .then(data => new Transport(data).load()).then(result => {
-                if (result != "OK") {
-                    alert("Failed!")
-                    return
-                }
-                window.location.href = "{{ url_for('webinterface.agents') }}"
-            });
-        }
-    </script>
+    <!-- Agents JavaScript -->
+    <script>{% include 'js/agents.js' %}</script>
 {% endblock %}

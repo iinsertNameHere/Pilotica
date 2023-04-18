@@ -1,5 +1,5 @@
-from flask import Blueprint
-from flask import request
+from flask import Blueprint, request
+from flask_login import current_user
 import json
 
 from .plugin.decorators import *
@@ -7,6 +7,7 @@ from .plugin.decorators import *
 from .console import Color
 from .database import *
 from .transport import Transport
+from .pilots import PilotRoles
 
 import __main__
 
@@ -202,13 +203,15 @@ def reply():
 
 @service.route("/agents", methods = {"GET", "DELETE"})
 def agents():
-    if not is_valid_key(request.headers.get("key")):
-        return Transport("FAILED").dump()
-
-    if request.method == "GET":
+    if not current_user.is_authenticated:
         if not is_valid_key(request.headers.get("key")):
             return Transport("FAILED").dump()
+    else:
+        if not current_user.role in [PilotRoles.ADMIN.get('name'), PilotRoles.OPERATOR.get('name')]:
+            if serviceConf["logging"]: print(f"{Color.Green}::{Color.White} current_pilot.role is not ADMIN or OPERATOR!"+Color.Reset)
+            return Transport("FAILED").dump()
 
+    if request.method == "GET":
         agents = Agent.query.all()
         if agents is None:
             return Transport("NONE").dump()
@@ -228,8 +231,13 @@ def agents():
 
 @service.route("/agent", methods = {"GET", "DELETE"})
 def agent():
-    if not is_valid_key(request.headers.get("key")):
-        return Transport("FAILED").dump()
+    if not current_user.is_authenticated:
+        if not is_valid_key(request.headers.get("key")):
+            return Transport("FAILED").dump()
+    else:
+        if not current_user.role in [PilotRoles.ADMIN.get('name'), PilotRoles.OPERATOR.get('name')]:
+            if serviceConf["logging"]: print(f"{Color.Green}::{Color.White} current_pilot.role is not ADMIN or OPERATOR!"+Color.Reset)
+            return Transport("FAILED").dump()
 
     try:
         id = int(request.args.get('id'))
@@ -245,10 +253,100 @@ def agent():
         agent = Agent.query.filter_by(id=id).first()
         if agent is None:
             if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} No Agent found with id: {id}"+Color.Reset)
-            return Transport("FAIL").dump()
+            return Transport("FAILED").dump()
         return Transport(agent.jsonify()).dump()
 
     else:        
         Agent.delete(id)
         if serviceConf["logging"]: print(f"{Color.Green}::{Color.White} Deleted Agent by id: {id}"+Color.Reset)
         return Transport("OK").dump()
+
+@service.route("/pilots", methods = {"GET", "DELETE"})
+def pilots():
+    if not current_user.is_authenticated:
+        if not is_valid_key(request.headers.get("key")):
+            return Transport("FAILED").dump()
+    else:
+        if not current_user.role == PilotRoles.ADMIN.get('name'):
+            if serviceConf["logging"]: print(f"{Color.Green}::{Color.White} current_pilot.role is not ADMIN!"+Color.Reset)
+            return Transport("FAILED").dump()
+
+    if request.method == "GET":
+        pilots = Pilot.query.all()
+        if pilots is None:
+            return Transport("NONE").dump()
+
+        dict_repr = dict()
+        for pilot in pilots:
+            jpilot: dict = pilot.jsonify(asDict=True)
+            jpilot.pop('id')
+            dict_repr[str(pilot.id)] = jpilot
+        return Transport(json.dumps(dict_repr)).dump()
+
+    else:
+        Pilot.delete_all()
+        if serviceConf["logging"]: print(f"{Color.Green}::{Color.White} Deleted all Pilots!"+Color.Reset)
+        return Transport("OK").dump()
+
+
+@service.route("/pilot", methods = {"GET", "DELETE", "PUT"})
+def pilot():
+    if not current_user.is_authenticated:
+        if not is_valid_key(request.headers.get("key")):
+            return Transport("FAILED").dump()
+    else:
+        if not current_user.role == PilotRoles.ADMIN.get('name'):
+            if serviceConf["logging"]: print(f"{Color.Green}::{Color.White} current_pilot.role is not ADMIN!"+Color.Reset)
+            return Transport("FAILED").dump()
+
+    try:
+        id = int(request.args.get('id'))
+    except:
+        if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} Invalid id: {id}"+Color.Reset)
+        return Transport("FAILED").dump()
+
+    if id is None:
+        if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} No id was given!"+Color.Reset)
+        return Transport("FAILED").dump()
+
+    if request.method == "GET":
+        pilot = Pilot.query.filter_by(id=id).first()
+        if pilot is None:
+            if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} No Pilot found with id: {id}"+Color.Reset)
+            return Transport("FAILED").dump()
+        return Transport(pilot.jsonify()).dump()
+    elif request.method == "PUT":
+        jdata: dict = json.loads(Transport(request.data.decode()).load())
+        keys = jdata.keys()
+        if not was_given("id", keys) or \
+        not was_given("name", keys) or \
+        not was_given("pwd_hash", keys) or \
+        not was_given("role", keys):
+            return Transport("FAILED").dump()
+        id: int = int(jtask["name"])
+        name: str = jtask["name"]
+        pwd_hash: str = json.dumps(jtask["hash"])
+        role: str = jtask["role"]
+
+        if Pilot.exists(id=id):
+            pilot = Pilot.query.filter_by(name=name).first()
+            if pilot.id != id:
+                if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} Pilot with name '{name}' alredy exists!"+Color.Reset)
+                return Transport("FAILED").dump()
+
+            pilot: Pilot = Pilot.query.filter_by(id=id).first()
+            pilot.name = name
+            pilot.pwd_hash = pwd_hash
+            pilot.role = role
+            
+            db.session.commit()
+            return Transport("OK").dump()
+        else:
+            serviceConf["logging"]: print(f"{Color.Red}::{Color.White} Pilot with id '{id}' dose not exist!"+Color.Reset)
+            return Transport("FAILED").dump()
+
+    else:        
+        Pilot.delete(id)
+        if serviceConf["logging"]: print(f"{Color.Green}::{Color.White} Deleted Pilot by id: {id}"+Color.Reset)
+        return Transport("OK").dump()
+

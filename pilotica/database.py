@@ -23,6 +23,17 @@ class Pilot(UserMixin, db.Model):
         
         return pilot != None
     
+    def delete(id: int):
+        pilot = Pilot.query.filter_by(id=id).first()
+        db.session.delete(pilot)
+        db.session.commit()
+
+    def delete_all():
+        pilots = Pilot.query.all()
+        for pilot in pilots:
+            db.session.delete(pilot)
+        db.session.commit()
+
     def jsonify(self, asDict=False):
         dict_repr = {
             "id": self.id,
