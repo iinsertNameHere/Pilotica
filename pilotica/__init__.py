@@ -73,11 +73,6 @@ def setup_app(name, db_name="session.db"):
             db.session.add(initial_pilot)
             db.session.commit()
 
-        if not len(Pilot.query.all()) > 1:
-            initial_pilot = Pilot(name="adminpilot2", pwd_hash=generate_password_hash("admin"), role='ADMIN')
-            db.session.add(initial_pilot)
-            db.session.commit()
-
 
     # add blueprints
     app.register_blueprint(service)

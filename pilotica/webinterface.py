@@ -64,7 +64,8 @@ def edit_pilot():
                 failed = True
         if not failed:
             pilot.name = request.form.get('name')
-            pilot.role = request.form.get('role')
+            if id != current_user.id:
+                pilot.role = request.form.get('role')
 
             db.session.commit()
     else:
