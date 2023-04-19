@@ -2,10 +2,7 @@ from pilotica import setup_app, component_manager
 from pilotica.components.decorators import *
 from pilotica.console import Color
 from flask import send_from_directory
-from pilotica.transport import Transport
 import pilotica.settings as ps
-
-from flask import request, redirect, url_for
 
 import argparse
 

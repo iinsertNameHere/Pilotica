@@ -33,7 +33,6 @@ def agents():
 @webinterface.route("/pilots/new", methods = {'POST'})
 @login_required
 def new_pilot():
-    print(request.form)
     pwd1 = request.form.get('password1')
     pwd2 = request.form.get('password2')
     if pwd1 == pwd2:
