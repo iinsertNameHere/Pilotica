@@ -1,12 +1,12 @@
-# Importing plugin api
-from pilotica.plugin.api import *
+# Importing Component-Package api
+from pilotica.components.api import *
 
 # Importing needed classes, functions and variables
 from base64 import urlsafe_b64encode as base64encode, urlsafe_b64decode as base64decode
 import pilotica.transport as tp
 
-@Mixin
-class Mixins():
+@Scopes
+class Scopes():
     def transport(self, **kwargs):
         def dump(self):
             return base64encode(self.data.encode()).decode()

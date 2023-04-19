@@ -17,12 +17,12 @@ from .auth import auth
 from .database import db, Pilot
 from .config import Config
 from .console import Color
-from .plugin.engine import PluginManager, Plugin
+from .components.engine import ComponentManager, Component
 
 import pilotica.settings as ps
 import pilotica.pilots as pilots
 
-plugin_manager = PluginManager()
+component_manager = ComponentManager()
 
 def setup_app(name, db_name="session.db"):
     # create the app
@@ -61,7 +61,7 @@ def setup_app(name, db_name="session.db"):
     try:
         os.makedirs(app.instance_path)
         os.makedirs(os.path.join(app.instance_path, "config"))
-        os.makedirs(os.path.join(app.instance_path, "plugins"))
+        os.makedirs(os.path.join(app.instance_path, "components"))
         os.makedirs(os.path.join(app.instance_path, "pilots"))
     except OSError:
         pass
@@ -79,15 +79,15 @@ def setup_app(name, db_name="session.db"):
     app.register_blueprint(webinterface)
     app.register_blueprint(auth)
 
-    #Init Plugins
-    for plugin in config.plugin_list:
-        plugin_manager.add(Plugin(app.instance_path, plugin["alias"], logging=plugin["logging"]))
+    #Init Components
+    for component in config.component_list:
+        component_manager.add(Component(app.instance_path, component.get("alias"), logging=component.get("logging")))
 
-    if len(plugin_manager.plugins["all"]) > 0:
+    if len(component_manager.components.get("all")) > 0:
         print()
 
     # Init Globals
-    ps.plugin_manager = plugin_manager
+    ps.component_manager = component_manager
 
     service_conf = {
         "online": True,
@@ -95,5 +95,19 @@ def setup_app(name, db_name="session.db"):
         "secret_key": secret_key
     }
     init_service(service_conf, service_dict=__service_main__.__dict__)
+
+    @app.route("/transport/load", methods = {'GET'})
+    def transport_load():
+        data = request.args.get("data")
+        return Transport(data).load()
+
+    @app.route("/transport/dump", methods = {'GET'})
+    def transport_dump():
+        data = request.args.get("data")
+        return Transport(data).dump()
+
+    @app.route("/")
+    def index():
+        return redirect(url_for('webinterface.agents'))
 
     return app, config

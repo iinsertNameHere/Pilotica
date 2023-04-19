@@ -3,7 +3,7 @@ pilotica:
   API_LOGGING: True
   secret_key: RANDOM # If set to RANDOM a new key is generated every session
 
-# Pilotica Plugins
-plugins:
+# Pilotica Component-Packages to use
+components:
   - alias: "base64-transport"
     logging: False

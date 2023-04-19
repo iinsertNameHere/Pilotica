@@ -2,7 +2,7 @@ from flask import Blueprint, request
 from flask_login import current_user
 import json
 
-from .plugin.decorators import *
+from .components.decorators import *
 
 from .console import Color
 from .database import *
@@ -22,26 +22,26 @@ serviceConf: dict = {
 def is_valid_key(key: str):
     from .settings import secret_key
     if key is None:
-        if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} No key was given!"+Color.Reset)
+        if serviceConf["logging"]: print(f"\n{Color.Red}::{Color.White} No key was given!"+Color.Reset)
         return False
     elif key != secret_key:
-        if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} Invalid key: {key}"+Color.Reset)
+        if serviceConf["logging"]: print(f"\n{Color.Red}::{Color.White} Invalid key: {key}"+Color.Reset)
         return False
     return True
 
 def was_given(field: str, jdata_keys: list[str]):
     if not field in jdata_keys:
-        if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} No {field} was given!"+Color.Reset)
+        if serviceConf["logging"]: print(f"\n{Color.Red}::{Color.White} No {field} was given!"+Color.Reset)
         return False
     else:
         return True
 
-@EnableMixins(globals(), "service", args=["service_dict"])
+@EnableComponents(globals(), "service", args=["service_dict"])
 def init_service(service_conf, service_dict = __main__.__dict__):
     global serviceConf
     serviceConf = service_conf
 
-    HANDLE_MIXINS
+    HANDLE_PCPKGS
 
 @service.route("")
 @service.route("/")
@@ -50,8 +50,10 @@ def status():
     Function to get the status of the api service
     """
     if serviceConf["online"]:
+        if serviceConf["logging"]: print(f"\n{Color.Green}::{Color.White} Getting Service status (online)"+Color.Reset)
         return Transport("online").dump()
     else:
+        if serviceConf["logging"]: print(f"\n{Color.Green}::{Color.White} Getting Service status (offline)"+Color.Reset)
         return Transport("offline").dump()
 
 @service.route("/bind", methods = {"POST"})
@@ -67,7 +69,7 @@ def bind():
 
     if Agent.exists(uuid):
         Agent.update_beacon(uuid)
-        if serviceConf["logging"]: print(f"{Color.Green}::{Color.White} Checked in Agent: {uuid}"+Color.Reset)
+        if serviceConf["logging"]: print(f"\n{Color.Green}::{Color.White} Checked in Agent: {uuid}"+Color.Reset)
     
     else:
         if not was_given("hostname", jdata.keys()):
@@ -77,7 +79,7 @@ def bind():
         newAgent = Agent(uuid=uuid, hostname=hostname)
         db.session.add(newAgent)
         db.session.commit()
-        if serviceConf["logging"]: print(f"{Color.Green}::{Color.White} Added new Agent: {uuid}"+Color.Reset)
+        if serviceConf["logging"]: print(f"\n{Color.Green}::{Color.White} Added new Agent: {uuid}"+Color.Reset)
 
     return Transport("OK").dump()
 
@@ -97,11 +99,11 @@ def task():
         try:
             id = int(request.args.get('id'))
         except:
-            if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} Invalid id: {id}"+Color.Reset)
+            if serviceConf["logging"]: print(f"\n{Color.Red}::{Color.White} Invalid id: {id}"+Color.Reset)
             return Transport("FAILED").dump()
 
         Task.delete(id)
-        if serviceConf["logging"]: print(f"{Color.Green}::{Color.White} Deleted Task by id: {id}"+Color.Reset)
+        if serviceConf["logging"]: print(f"\n{Color.Green}::{Color.White} Deleted Task by id: {id}"+Color.Reset)
         return Transport("OK").dump()
 
     jdata: dict = json.loads(Transport(request.data.decode()).load())
@@ -111,7 +113,7 @@ def task():
     uuid: str = jdata["uuid"]
 
     if not Agent.exists(uuid):
-        if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} Agent {uuid} dose not exist!"+Color.Reset)
+        if serviceConf["logging"]: print(f"\n{Color.Red}::{Color.White} Agent {uuid} dose not exist!"+Color.Reset)
         return Transport("FAILED").dump()
 
     if request.method == "POST":
@@ -136,13 +138,13 @@ def task():
         db.session.add(newTask)
         db.session.commit()
 
-        if serviceConf["logging"]: print(f"{Color.Green}::{Color.White} Added new Task for Agent: {uuid}"+Color.Reset)
+        if serviceConf["logging"]: print(f"\n{Color.Green}::{Color.White} Added new Task for Agent: {uuid}"+Color.Reset)
         return Transport(str(newTask.id)).dump()
 
     elif request.method == "GET":
         Agent.update_beacon(uuid)
 
-        if serviceConf["logging"]: print(f"{Color.Green}::{Color.White} Geting next Task for Agent: {uuid}"+Color.Reset)
+        if serviceConf["logging"]: print(f"\n{Color.Green}::{Color.White} Geting next Task for Agent: {uuid}"+Color.Reset)
         task = Agent.get_nextTask(uuid)
 
         if task != None:
@@ -166,7 +168,7 @@ def reply():
         uuid: str = jdata["uuid"]
 
         if not Agent.exists(uuid):
-            if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} Agent {uuid} dose not exist!"+Color.Reset)
+            if serviceConf["logging"]: print(f"\n{Color.Red}::{Color.White} Agent {uuid} dose not exist!"+Color.Reset)
             return Transport("FAILED").dump()
         Agent.update_beacon(uuid)
 
@@ -174,7 +176,7 @@ def reply():
             return Transport("FAILED").dump()
         content: str = jdata["content"]
 
-        if serviceConf["logging"]: print(f"{Color.Green}::{Color.White} Setting reply for Task: {task_id}"+Color.Reset)
+        if serviceConf["logging"]: print(f"\n{Color.Green}::{Color.White} Setting reply for Task: {task_id}"+Color.Reset)
         Task.get_by_id(task_id).set_reply(content)
 
         return Transport("OK").dump()
@@ -186,19 +188,18 @@ def reply():
         try:
             id = int(request.args.get('id'))
         except:
-            if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} Invalid id: {id}"+Color.Reset)
+            if serviceConf["logging"]: print(f"\n{Color.Red}::{Color.White} Invalid id: {id}"+Color.Reset)
             return Transport("FAILED").dump()
 
         if id is None:
-            if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} No id was given!"+Color.Reset)
+            if serviceConf["logging"]: print(f"\n{Color.Red}::{Color.White} No id was given!"+Color.Reset)
             return Transport("FAILED").dump()
 
         task = Task.get_by_id(id)
         if task is None:
             return Transport("NONE").dump()
         else:
-            print(task.get_reply())
-            if serviceConf["logging"]: print(f"{Color.Green}::{Color.White} Getting reply of Task: {id}"+Color.Reset)
+            if serviceConf["logging"]: print(f"\n{Color.Green}::{Color.White} Getting reply of Task: {id}"+Color.Reset)
             return  Transport(task.get_reply()).dump()
 
 @service.route("/agents", methods = {"GET", "DELETE"})
@@ -208,7 +209,7 @@ def agents():
             return Transport("FAILED").dump()
     else:
         if not current_user.role in [PilotRoles.ADMIN.get('name'), PilotRoles.OPERATOR.get('name')]:
-            if serviceConf["logging"]: print(f"{Color.Green}::{Color.White} current_pilot.role is not ADMIN or OPERATOR!"+Color.Reset)
+            if serviceConf["logging"]: print(f"\n{Color.Green}::{Color.White} current_pilot.role is not ADMIN or OPERATOR!"+Color.Reset)
             return Transport("FAILED").dump()
 
     if request.method == "GET":
@@ -221,11 +222,13 @@ def agents():
             jagent: dict = agent.jsonify(asDict=True)
             jagent.pop("id")
             dict_repr[str(agent.id)] = jagent
+        
+        if serviceConf["logging"]: print(f"\n{Color.Green}::{Color.White} Getting all Agents!"+Color.Reset)
         return Transport(json.dumps(dict_repr)).dump()
 
     else:
         Agent.delete_all()
-        if serviceConf["logging"]: print(f"{Color.Green}::{Color.White} Deleted all Agents!"+Color.Reset)
+        if serviceConf["logging"]: print(f"\n{Color.Green}::{Color.White} Deleted all Agents!"+Color.Reset)
         return Transport("OK").dump()
 
 
@@ -236,29 +239,30 @@ def agent():
             return Transport("FAILED").dump()
     else:
         if not current_user.role in [PilotRoles.ADMIN.get('name'), PilotRoles.OPERATOR.get('name')]:
-            if serviceConf["logging"]: print(f"{Color.Green}::{Color.White} current_pilot.role is not ADMIN or OPERATOR!"+Color.Reset)
+            if serviceConf["logging"]: print(f"\n{Color.Green}::{Color.White} current_pilot.role is not ADMIN or OPERATOR!"+Color.Reset)
             return Transport("FAILED").dump()
 
     try:
         id = int(request.args.get('id'))
     except:
-        if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} Invalid id: {id}"+Color.Reset)
+        if serviceConf["logging"]: print(f"\n{Color.Red}::{Color.White} Invalid id: {id}"+Color.Reset)
         return Transport("FAILED").dump()
 
     if id is None:
-        if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} No id was given!"+Color.Reset)
+        if serviceConf["logging"]: print(f"\n{Color.Red}::{Color.White} No id was given!"+Color.Reset)
         return Transport("FAILED").dump()
 
     if request.method == "GET":
         agent = Agent.query.filter_by(id=id).first()
         if agent is None:
-            if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} No Agent found with id: {id}"+Color.Reset)
+            if serviceConf["logging"]: print(f"\n{Color.Red}::{Color.White} No Agent found with id: {id}"+Color.Reset)
             return Transport("FAILED").dump()
+        if serviceConf["logging"]: print(f"\n{Color.Green}::{Color.White} Getting Agent with id: {id}"+Color.Reset)
         return Transport(agent.jsonify()).dump()
 
     else:        
         Agent.delete(id)
-        if serviceConf["logging"]: print(f"{Color.Green}::{Color.White} Deleted Agent by id: {id}"+Color.Reset)
+        if serviceConf["logging"]: print(f"\n{Color.Green}::{Color.White} Deleted Agent by id: {id}"+Color.Reset)
         return Transport("OK").dump()
 
 @service.route("/pilots", methods = {"GET", "DELETE"})
@@ -268,7 +272,7 @@ def pilots():
             return Transport("FAILED").dump()
     else:
         if not current_user.role == PilotRoles.ADMIN.get('name'):
-            if serviceConf["logging"]: print(f"{Color.Green}::{Color.White} current_pilot.role is not ADMIN!"+Color.Reset)
+            if serviceConf["logging"]: print(f"\n{Color.Green}::{Color.White} current_pilot.role is not ADMIN!"+Color.Reset)
             return Transport("FAILED").dump()
 
     if request.method == "GET":
@@ -281,11 +285,13 @@ def pilots():
             jpilot: dict = pilot.jsonify(asDict=True)
             jpilot.pop('id')
             dict_repr[str(pilot.id)] = jpilot
+
+        if serviceConf["logging"]: print(f"\n{Color.Green}::{Color.White} Getting all Pilots!"+Color.Reset)
         return Transport(json.dumps(dict_repr)).dump()
 
     else:
         Pilot.delete_all()
-        if serviceConf["logging"]: print(f"{Color.Green}::{Color.White} Deleted all Pilots!"+Color.Reset)
+        if serviceConf["logging"]: print(f"\n{Color.Green}::{Color.White} Deleted all Pilots!"+Color.Reset)
         return Transport("OK").dump()
 
 
@@ -296,25 +302,27 @@ def pilot():
             return Transport("FAILED").dump()
     else:
         if not current_user.role == PilotRoles.ADMIN.get('name'):
-            if serviceConf["logging"]: print(f"{Color.Green}::{Color.White} current_pilot.role is not ADMIN!"+Color.Reset)
+            if serviceConf["logging"]: print(f"\n{Color.Green}::{Color.White} current_pilot.role is not ADMIN!"+Color.Reset)
             return Transport("FAILED").dump()
 
     try:
         id = int(request.args.get('id'))
     except:
-        if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} Invalid id: {id}"+Color.Reset)
+        if serviceConf["logging"]: print(f"\n{Color.Red}::{Color.White} Invalid id: {id}"+Color.Reset)
         return Transport("FAILED").dump()
 
     if id is None:
-        if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} No id was given!"+Color.Reset)
+        if serviceConf["logging"]: print(f"\n{Color.Red}::{Color.White} No id was given!"+Color.Reset)
         return Transport("FAILED").dump()
 
     if request.method == "GET":
         pilot = Pilot.query.filter_by(id=id).first()
         if pilot is None:
-            if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} No Pilot found with id: {id}"+Color.Reset)
+            if serviceConf["logging"]: print(f"\n{Color.Red}::{Color.White} No Pilot found with id: {id}"+Color.Reset)
             return Transport("FAILED").dump()
+        if serviceConf["logging"]: print(f"\n{Color.Green}::{Color.White} Getting Pilot with id: {id}"+Color.Reset)
         return Transport(pilot.jsonify()).dump()
+
     elif request.method == "PUT":
         jdata: dict = json.loads(Transport(request.data.decode()).load())
         keys = jdata.keys()
@@ -323,16 +331,17 @@ def pilot():
         not was_given("pwd_hash", keys) or \
         not was_given("role", keys):
             return Transport("FAILED").dump()
-        id: int = int(jtask["name"])
-        name: str = jtask["name"]
-        pwd_hash: str = json.dumps(jtask["hash"])
-        role: str = jtask["role"]
+        id: int = int(jdata["id"])
+        name: str = jdata["name"]
+        pwd_hash: str = json.dumps(jdata["pwd_hash"])
+        role: str = jdata["role"]
 
         if Pilot.exists(id=id):
             pilot = Pilot.query.filter_by(name=name).first()
-            if pilot.id != id:
-                if serviceConf["logging"]: print(f"{Color.Red}::{Color.White} Pilot with name '{name}' alredy exists!"+Color.Reset)
-                return Transport("FAILED").dump()
+            if pilot:
+                if pilot.id != id:
+                    if serviceConf["logging"]: print(f"\n{Color.Red}::{Color.White} Pilot with name '{name}' alredy exists!"+Color.Reset)
+                    return Transport("FAILED").dump()
 
             pilot: Pilot = Pilot.query.filter_by(id=id).first()
             pilot.name = name
@@ -340,6 +349,8 @@ def pilot():
             pilot.role = role
             
             db.session.commit()
+
+            if serviceConf["logging"]: print(f"\n{Color.Green}::{Color.White} Updating Pilot with id: {id}"+Color.Reset)
             return Transport("OK").dump()
         else:
             serviceConf["logging"]: print(f"{Color.Red}::{Color.White} Pilot with id '{id}' dose not exist!"+Color.Reset)
@@ -347,6 +358,6 @@ def pilot():
 
     else:        
         Pilot.delete(id)
-        if serviceConf["logging"]: print(f"{Color.Green}::{Color.White} Deleted Pilot by id: {id}"+Color.Reset)
+        if serviceConf["logging"]: print(f"\n{Color.Green}::{Color.White} Deleted Pilot by id: {id}"+Color.Reset)
         return Transport("OK").dump()
 

@@ -4,13 +4,15 @@ from flask import Flask
 from os.path import join as join_path
 from shutil import copyfile
 
+import pilotica.settings as ps
+
 class Config:
     def __init__(self, instance_path: str, file_path: str):
         self.instance_path = instance_path
         self.path = file_path
         self.raw = dict()
         self.pilotica = dict()
-        self.plugin_list: list[dict] = list()
+        self.component_list: list[dict] = list()
 
     def create(self):
         origin = join_path(self.instance_path, 'config', 'origin.yaml')
@@ -48,14 +50,17 @@ class Config:
                 print(f"{Color.Red}::{Color.White} The field pilotica.{field[0]} has not the expected type!"+Color.Reset)
                 exit(-1)
 
-        if "plugins" in self.raw.keys():
-            self.plugin_list = self.raw["plugins"]
+        if not ps.no_components:
+            if "components" in self.raw.keys():
+                self.component_list = self.raw["components"]
+            else:
+                print(f"{Color.Yellow}The field pilotica.components is optional and not set. This my be an error,\nPlease check you config!\n\nTo suppress this warning in the future when not using component pkgs, please use the '--no-components' argument.\n"+Color.Reset)
         
-        for i, plugin in enumerate(self.plugin_list):
-            for key in ["alias", "logging"]:
-                if not key in plugin.keys():
-                    print(f"{Color.Red}::{Color.White} plugins[{i}] is missing field: {key}"+Color.Reset)
-                    exit(-1)
+            for i, component in enumerate(self.component_list):
+                for key in ["alias", "logging"]:
+                    if not key in component.keys():
+                        print(f"{Color.Red}::{Color.White} item {i+1} from components list in file '{self.path}' is missing field: {key}"+Color.Reset)
+                        exit(-1)
 
         
         

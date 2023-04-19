@@ -42,6 +42,8 @@ def new_pilot():
 
         db.session.add(new_pilot)
         db.session.commit()
+
+        flash("Added new Pilot!", 'success')
     else:
         flash("Passwords dont match!", 'danger')
     return redirect(url_for('webinterface.pilots'))
@@ -68,6 +70,7 @@ def edit_pilot():
                 pilot.role = request.form.get('role')
 
             db.session.commit()
+            flash("Saved Pilot Settings!", 'success')
     else:
         flash("Pilot dose not exist!", 'danger')
     

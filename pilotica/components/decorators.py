@@ -2,17 +2,17 @@ import inspect
 import types
 import functools
 
-def EnableMixins(_globals: dict, mixin_name: str, args: list = list(), returns: str = "plugin_returns"):
+def EnableComponents(_globals: dict, scope_name: str, args: list = list(), returns: str = "component_returns"):
     """
-    Use this Decorator to enable Mixin Handling for a function.
+    Use this Decorator to enable Component-Package Handling for a function.
 
-    *mixin_name* The name of the mixin function to execute
+    *scope_name* The name of the scope function to execute
 
-    *args* A list of variable names that will be forwarding to the Mixin function
+    *args* A list of variable names that will be forwarding to the Scope function
 
-    *returns* The name of the list that holds all plugin returns
+    *returns* The name of the list that holds all scope returns
 
-    You can define where in the function the mixins are handled by placing the line HANDLE_MIXINS there.
+    You can define where in the function the Components are handled by placing the line HANDLE_PCPKGS there.
     """
     def decorator(func):
         # get the function source code
@@ -26,23 +26,23 @@ def EnableMixins(_globals: dict, mixin_name: str, args: list = list(), returns: 
         for arg in args:
             kwargs.append(f"{arg}={arg}")
      
-        mixin_code = f'from pilotica.settings import plugin_manager\n' + \
+        scope_code = f'from pilotica.settings import component_manager\n' + \
                      f'{returns}: list = list()\n' + \
-                     f'for index in plugin_manager.get("{mixin_name}"):\n' + \
-                     f'    {returns}.append(plugin_manager.plugins["all"][index].mixins.{mixin_name}({",".join(kwargs)}))'
+                     f'for index in component_manager.get_byScope("{scope_name}"):\n' + \
+                     f'    {returns}.append(component_manager.components.get("all")[index].scopes.{scope_name}({",".join(kwargs)}))'
 
         position = 1
         for i, line in enumerate(func_src[1:]):
-            if line.strip() == "HANDLE_MIXINS":
+            if line.strip() == "HANDLE_PCPKGS":
                 position = i+1
                 break
 
         func_src.pop(position)
 
-        mixin_code_lines = ["    "+line for line in mixin_code.split('\n')]
+        scope_code_lines = ["    "+line for line in scope_code.split('\n')]
         if position <= len(func_src):
-            mixin_code_lines.reverse()
-            for line in mixin_code_lines:
+            scope_code_lines.reverse()
+            for line in scope_code_lines:
                 func_src.insert(position, line)
         else:
             raise ValueError("position index out of range!")

@@ -1,10 +1,13 @@
-from pilotica import setup_app, plugin_manager
-from pilotica.plugin.decorators import *
+from pilotica import setup_app, component_manager
+from pilotica.components.decorators import *
 from pilotica.console import Color
 from flask import send_from_directory
 from pilotica.transport import Transport
+import pilotica.settings as ps
 
 from flask import request, redirect, url_for
+
+import argparse
 
 import os
 
@@ -13,24 +16,13 @@ VERSION = "v1.0"
 host = "127.0.0.1"
 port = 4444
 
-app, config = setup_app(__name__)
+app, config = (None, None)
 
-@app.route("/transport/load", methods = {'GET'})
-def transport_load():
-    data = request.args.get("data")
-    return Transport(data).load()
-
-@app.route("/transport/dump", methods = {'GET'})
-def transport_dump():
-    data = request.args.get("data")
-    return Transport(data).dump()
-
-@app.route("/")
-def index():
-    return redirect(url_for('webinterface.agents'))
-
-@EnableMixins(globals(), "core")
+@EnableComponents(globals(), "core")
 def main():
+    global app, config
+    app, config = setup_app(__name__)
+
     if not config.pilotica.get("DEBUG"):
         if os.name == 'nt':
             os.system("set FLASK_ENV=production")
@@ -45,9 +37,18 @@ def main():
         print(f" * Secret Key: {app.config['SECRET_KEY']}")
         print(f" * Running on {Color.Bright.Yellow}http://{host}:{port}"+Color.Reset)
 
-    HANDLE_MIXINS
+    HANDLE_PCPKGS
 
     app.run(host, port, debug=config.pilotica.get("DEBUG"), threaded=True)
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(prog='Pilotica C2 Server')
+
+    parser.add_argument('--no-components', help='Starts Pilotica without loading Component-Packages',
+        required=False, action='store_true', default=False)
+
+    args = parser.parse_args()
+
+    ps.no_components = args.no_components
+
     main()

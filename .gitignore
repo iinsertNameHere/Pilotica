@@ -64,7 +64,7 @@ db.sqlite3-journal
 instance/*.db
 .webassets-cache
 
-instance/plugins/*
+instance/components/*.pcpkgs
 
 # Scrapy stuff:
 .scrapy

@@ -1,20 +1,20 @@
-# Importing plugin api
-from pilotica.plugin.api import *
+# Importing Component-Package api
+from pilotica.components.api import *
 
 # Importing needed classes, functions and variables
 from pilotica.service import serviceConf
 
-# Creating a Mixins class that holds all mixin functions
-# The @Mixin initializes all mixin functionality
+# Creating a Scopes class that holds all Scope functions
+# The @Scopes initializes all Scope functionality
 #
-# Each Mixin Function has to have the name of the mixin it wants to access.
+# Each Scope function has to have the name of the scope it wants to access.
 # 
-# INFO: This class is Required for the Plugin to run
-@Mixin
-class Mixins():
+# INFO: This class is Required for the Component-Packages to run
+@Scopes
+class Scopes():
     def core(self, **kwargs):
         """
-        Core mixin that is called just befor the Flask App is started
+        Core scope function that is called just befor the Flask App is started
         - return:
             True if execution was succesfull, else return False
         """

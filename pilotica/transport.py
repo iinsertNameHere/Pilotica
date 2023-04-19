@@ -1,10 +1,10 @@
-from .plugin.decorators import *
+from .components.decorators import *
 
 class Transport:
-    @EnableMixins(globals(), "transport", args=["data"])
+    @EnableComponents(globals(), "transport", args=["data"])
     def __init__(self, data: str):
-        HANDLE_MIXINS
-        self.data = plugin_returns[0]
+        HANDLE_PCPKGS
+        self.data = component_returns[0]
     
     def dump(self):
         return self.data

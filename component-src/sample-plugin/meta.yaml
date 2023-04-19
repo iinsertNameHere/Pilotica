@@ -1,0 +1,9 @@
+# Component-Package Metadata
+name: "Sample ComponentPKG"                        # The full name of the Component-PKG
+alias: "sample-component"                       # The code alias of the Component-PKG
+creator: "sampledev"                         # The name of the creator of the Component-PKG
+version: '1.0.0'                             # The Component-Package Version
+description: "Component-PKG Template for Pilotica" # A description of the Component-PKG
+scopes:                                      # A list of scopes the Component-PKG needs to access
+  # Core Scope
+  - core
