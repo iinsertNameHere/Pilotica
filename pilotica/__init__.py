@@ -60,9 +60,8 @@ def setup_app(name, db_name="session.db"):
     # ensure the instance folder exists
     try:
         os.makedirs(app.instance_path)
-        os.makedirs(os.path.join(app.instance_path, "config"))
-        os.makedirs(os.path.join(app.instance_path, "components"))
-        os.makedirs(os.path.join(app.instance_path, "pilots"))
+        os.mkdir(os.path.join(app.instance_path, "config"))
+        os.mkdir(os.path.join(app.instance_path, "components"))
     except OSError:
         pass
 
