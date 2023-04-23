@@ -15,8 +15,10 @@
 <p align="center">
   <a href="#key-features">Key Features</a> •
   <a href="#installation">Installation</a> •
+  <a href="#terminology">Terminology</a> •
   <a href="#how-to-use">How To Use</a> •
   <a href="#pcpkgs">PCPKGS</a> •
+  <a href="#service-api">Service-API</a> •
   <a href="#license">License</a>
 </p>
 
@@ -57,10 +59,26 @@ $ python3 pilotica.py
 > **Note**
 > If you're using Windows, you could also download the repo as a zip file.
 
+## Terminology
+**Pilot:**<br>
+Refers to the user of the Pilotica framework who utilizes its features and functionalities to operate and manage their systems.
+
+**Agent:**<br>
+Refers to the payload that is deployed on target systems to facilitate communication between the Pilot and the target systems.
+
+**pcpkg:**<br>
+Refers to the Pilotica-Component-Package, which is a plugin or add-on that extends the capabilities of the framework. These packages are pre-built and can be easily integrated into the framework.
+
+**Transport:**<br>
+Refers to an object that is used to handle incoming and outgoing data. This object can be a socket, a network interface, or any other suitable means of communication.
+
+**Service-API:**<br>
+Refers to the C2 Server API, which is responsible for handling the communication between the Pilot and the target systems. This API allows the Pilot to execute various commands and receive data from the target systems.*
+
 ## How To Use
 
 * The simplest way to use Pilotica is to just run the file from the terminal without any arguments and without touching the config file:
-    - This will run run Pilotica With logging enabled and with the Component-Package "transport-base64" loaded, with will encode all data that is transported using base64.
+    - This will run run Pilotica With logging enabled and with the Component-Package "transport-base64" loaded, witch will encode all data that is transported using base64.
 
 * The config file can be found in /instance/config and is named "config.yaml" by default.
 
@@ -74,7 +92,7 @@ $ python3 pilotica.py
 >  - **`secret_key`** *(`string`)* *Sets Service-API key*
 >    - If set to `RANDOM` generates new key every session.
 >- **`components`** *(`array`)* *(not required)* *A list of all pcpkgs to load*
->  - **Items** *(`object`)*
+>  - **`Items`** *(`object`)*
 >    - **`alias`** *(`string`)* *Alias of the package*
 >    - **`logging`** *(`boolean`)* *Enables logging for the package*
 >
@@ -106,7 +124,7 @@ src-dir
 >- **`version`** *(`string`)* *The package version*
 >- **`description`** *(`string`)* *What dose the package do?*
 >- **`scopes`** *(`array`)* *All the scopes that the package wants to access*
->  - **Items** *(`string`)* *A scope name*
+>  - **`Items`** *(`string`)* *A scope name*
 
 This is the Schema a meta.yaml file has to follow.
 
@@ -134,6 +152,9 @@ This is the Schema a meta.yaml file has to follow.
 >     - Has to return `None`, `True` or `False`
 
 This are all the rules for the base.py file.
+
+## Service-API
+[Service-API documentation](SERVICEAPI.md)
 
 ## License
 
