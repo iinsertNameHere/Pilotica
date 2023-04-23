@@ -154,7 +154,7 @@ This is the Schema a meta.yaml file has to follow.
 This are all the rules for the base.py file.
 
 ## Service-API
-[Service-API documentation](SERVICEAPI.md)
+[Service-API documentation](docs/SERVICEAPI.md)
 
 ## License
 
