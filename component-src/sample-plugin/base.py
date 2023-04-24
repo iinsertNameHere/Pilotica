@@ -2,7 +2,7 @@
 from pilotica.components.api import *
 
 # Importing needed classes, functions and variables
-from pilotica.service import serviceConf
+from pilotica.web.service import serviceConf
 
 # Creating a Scopes class that holds all Scope functions
 # The @Scopes initializes all Scope functionality

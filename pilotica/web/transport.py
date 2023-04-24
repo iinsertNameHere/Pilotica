@@ -1,4 +1,4 @@
-from .components.decorators import *
+from ..components.decorators import *
 
 class Transport:
     @EnableComponents(globals(), "transport", args=["data"])

@@ -5,7 +5,6 @@ The Pilotica Service API can be used to develop custom Agents and User intagerer
 
 ### **Request Schemas:**
 
-
 <details>
     <summary>:inbox_tray: Service Status</summary>
     <blockquote>
@@ -234,10 +233,10 @@ The Pilotica Service API can be used to develop custom Agents and User intagerer
     <blockquote>
     <p><strong>Request Body (<em>json</em>)</strong></p>
     <pre><code class="language-json">{
-        &quot;id&quot;: &lt;intager&gt;,
-        &quot;name&quot;: &lt;string&gt;,
-        &quot;pwd_hash&quot;: &lt;string&gt;,
-        &quot;role&quot;: &lt;string: &quot;OBSERVER&quot; or &quot;OPERATOR&quot; or &quot;ADMIN&quot;&gt;
+    &quot;id&quot;: &lt;intager&gt;,
+    &quot;name&quot;: &lt;string&gt;,
+    &quot;pwd_hash&quot;: &lt;string&gt;,
+    &quot;role&quot;: &lt;string: &quot;OBSERVER&quot; or &quot;OPERATOR&quot; or &quot;ADMIN&quot;&gt;
 }</code></pre>
     </blockquote>
 </details>
@@ -293,13 +292,13 @@ The Pilotica Service API can be used to develop custom Agents and User intagerer
     <blockquote>
     <p><strong>Request Body (<em>json</em>)</strong></p>
     <pre><code class="language-json">{
-        &quot;uuid&quot;: &lt;string&gt;,
-        &quot;task&quot;: {
-            &quot;file&quot;: &lt;string&gt;,
-            &quot;args&quot;: &lt;list&gt;,
-            &quot;verbose&quot;: &lt;boolean&gt;
-        }
-    }</code></pre>
+    &quot;uuid&quot;: &lt;string&gt;,
+    &quot;task&quot;: {
+        &quot;file&quot;: &lt;string&gt;,
+        &quot;args&quot;: &lt;list&gt;,
+        &quot;verbose&quot;: &lt;boolean&gt;
+    }
+}</code></pre>
     </blockquote>
 </details>
 
@@ -365,9 +364,9 @@ The Pilotica Service API can be used to develop custom Agents and User intagerer
     <blockquote>
     <p><strong>Request Body (<em>json</em>)</strong></p>
     <pre><code class="language-json">{
-        &quot;uuid&quot;: &lt;string&gt;,
-        &quot;task_id&quot;: &lt;intager&gt;,
-        &quot;content&quot;: &lt;string&gt;
+    &quot;uuid&quot;: &lt;string&gt;,
+    &quot;task_id&quot;: &lt;intager&gt;,
+    &quot;content&quot;: &lt;string&gt;
 }</code></pre>
     </blockquote>
 </details>

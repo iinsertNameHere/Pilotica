@@ -4,25 +4,24 @@ import secrets
 import yaml
 
 # Flask imports
-from pilotica.custom_flask import CustomFlask
+from .web.custom_flask import CustomFlask
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash
 from flask import request, redirect, url_for
-from pilotica.transport import Transport
+from .web.transport import Transport
 
-# Blueprint imports
-from .service import service, init_service, __main__ as __service_main__
-from .webinterface import webinterface
-from .auth import auth
+# Web imports
+from .web.service import service, init_service, __main__ as __service_main__
+from .web.interface import webinterface
+from .web.auth import auth
+from .web.database import db, Pilot
 
 # pilotica imports
-from .database import db, Pilot
+import pilotica.settings as ps
+import pilotica.web.pilots as pilots
 from .config import Config
 from .console import Color
 from .components.engine import ComponentManager, Component
-
-import pilotica.settings as ps
-import pilotica.pilots as pilots
 
 component_manager = ComponentManager()
 

@@ -2,10 +2,11 @@ from flask import Blueprint
 from flask import request
 import json
 
-from .console import Color
+from ..settings import secret_key
+from ..console import Color
+
 from .database import *
 from .transport import Transport
-from .settings import secret_key
 from .pilots import PilotRoles
 
 from flask import render_template, redirect, url_for, flash
