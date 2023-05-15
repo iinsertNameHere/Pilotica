@@ -1,5 +1,7 @@
 from flask_login import LoginManager
 
+instance_path = None
+
 component_manager = None
 secret_key = None
 

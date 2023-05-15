@@ -1,25 +1,50 @@
 from pilotica.components.generation import ComponentPKGCompiler
-from pilotica.console import Color
-import os
+from pilotica.console import Color, Logger
 import argparse
 import yaml
+import os
+
+"""
+This is a tool to pack Pilotica-Component Source directorys
+into Pilotica-Component-Packages, that can be used like
+Plugin packages.
+"""
+
+def get_args():
+    parser = argparse.ArgumentParser(
+        prog='Pilotica-Component Packager',
+        description='Packs Pilotica-Component Source directorys into Pilotica-Component-Packages'
+    )
+
+    parser.add_argument(
+        '--src',
+        default=None,
+        required=False
+    )
+    parser.add_argument(
+        '-o', '--output',
+        help='Output directory',
+        default=None,
+        required=False
+    )
+    parser.add_argument(
+        '-a', '--auto',
+        help='Automaticly build all Component-Packages requirred to run Pilotica',
+        required=False,
+        action='store_true'
+    )
+
+    return parser.parse_args()
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-                    prog='Pilotica-Component Packager',
-                    description='Packs Pilotica-Component Source directorys into Pilotica-Component-Packages')
+    logger = Logger()
 
-    parser.add_argument('--src', default=None, required=False)
-    parser.add_argument('-o', '--output', help='Output directory',
-        default=None, required=False)
-    parser.add_argument('-a', '--auto', help='Automaticly build all Component-Packages requirred to run Pilotica',
-        required=False, action='store_true', )
-
-    args = parser.parse_args()
+    args = get_args()
 
     PCPKG_Compiler = ComponentPKGCompiler()
-    
-    print(f"{Color.Bright.Magenta}Started Pilotica-Component Packager in {'auto' if args.auto else 'manual'} mode!"+Color.Reset)
+
+    start_msg = f"Started Pilotica-Component Packager in '{'auto' if args.auto else 'manual'}' mode!"
+    logger.custom(start_msg, {Color.Bright.Magenta}, True, str())
 
     if args.auto:
         path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'component-src')
@@ -33,7 +58,7 @@ if __name__ == "__main__":
         
         sub_folders = [os.path.join(path, name) for name in os.listdir(path) if os.path.isdir(os.path.join(path, name))]
         for src_folder in sub_folders:
-            print(f"{Color.Bright.Blue}::{Color.White} Generating Component-Package for: {src_folder}"+Color.Reset)
+            logger.info(f"Generating Component-Package for: {src_folder}")
             
             PCPKG_Compiler.validate(src_folder)
 
@@ -44,7 +69,7 @@ if __name__ == "__main__":
     else:
         src_folder = args.src
         if src_folder == None:
-            print(f"{Color.Red}::{Color.White} --src is required in manual mode!"+Color.Reset)
+            logger.error("--src is required in manual mode!")
             parser.print_usage()
             exit(-1)
 
@@ -56,7 +81,7 @@ if __name__ == "__main__":
         if not os.path.isdir(dst_folder):
                 os.makedirs(dst_folder)
 
-        print(f"{Color.Bright.Blue}::{Color.White} Generating Component-Package for: {src_folder}"+Color.Reset)
+        logger.info(f"Generating Component-Package for: {src_folder}")
         
         PCPKG_Compiler.validate(src_folder)
 

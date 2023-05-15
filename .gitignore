@@ -129,4 +129,9 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+instance/latest-go.tar.gz
+instance/latest-go.zip
+instance/go
+instance/GOVERSION.txt
+
 config.yaml

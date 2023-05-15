@@ -66,6 +66,8 @@ def setup_app(name, db_name="session.db"):
     except OSError:
         pass
 
+    ps.instance_path = app.instance_path
+
     # create pilots
     with app.app_context():
         if not len(Pilot.query.all()) > 0:

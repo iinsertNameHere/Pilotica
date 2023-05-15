@@ -23,10 +23,10 @@ Color = _color()
 
 class Logger:
     def __init__(self, prefix: str = '::', active: bool = True):
-        self.log_prefix = prefix
-        self.active = active
+        self._log_prefix = prefix
+        self._active = active
 
-        self.colors = {
+        self._colors = {
             "warning": Color.Yellow,
             "error": Color.Red,
             "success": Color.Green,
@@ -34,24 +34,44 @@ class Logger:
         }
     
     def _log(self, type: str, msg: str, prefix: str = str(), full_color: bool = False):
-        print(
-            prefix, self.colors[type],
-            f"{self.log_prefix}{'' if full_color else Color.White} {msg}",
-            sep="",
-            end=f"{Color.Reset}\n")
+        if self._active:
+            print(f"{prefix}{self._colors[type]}{self._log_prefix}{'' if full_color else Color.White} {msg}",
+                end=f"{Color.Reset}\n")
 
-    def warning(self, msg, prefix: str = str(), full_color: bool = False):
-        if self.active:
-            self._log("warning", msg, prefix=prefix, full_color=full_color)
+    def warning(self, msg: str, prefix: str = str(), full_color: bool = False):
+        self._log("warning", msg, prefix=prefix, full_color=full_color)
 
-    def error(self, msg, prefix: str = str(), full_color: bool = False):
-        if self.active:
-            self._log("error", msg, prefix=prefix, full_color=full_color)
+    def error(self, msg: str, prefix: str = str(), full_color: bool = False):
+        self._log("error", msg, prefix=prefix, full_color=full_color)
 
-    def success(self, msg, prefix: str = str(), full_color: bool = False):
-        if self.active:
-            self._log("success", msg, prefix=prefix, full_color=full_color)
+    def success(self, msg: str, prefix: str = str(), full_color: bool = False):
+        self._log("success", msg, prefix=prefix, full_color=full_color)
 
-    def info(self, msg, prefix: str = str(), full_color: bool = False):
-        if self.active:
-            self._log("info", msg, prefix=prefix, full_color=full_color)
+    def info(self, msg: str, prefix: str = str(), full_color: bool = False):
+        self._log("info", msg, prefix=prefix, full_color=full_color)
+
+    def custom(
+        self,
+        msg: str,
+        color: str,
+        full_color: bool,
+        log_prefix: str,
+        end=f"{Color.Reset}\n"
+    ):
+        if self._active:
+            print(f"{color}{log_prefix}{'' if full_color else Color.White} {msg}", end=end)
+
+    def prompt_YesNo(self, prompt: str, color: str) -> bool:
+        yes_choices = ['yes', 'y']
+        no_choices = ['no', 'n']
+
+        error_color = self._colors['error']
+
+        while True:
+            choice = input(f"{color}{self._log_prefix} {Color.Bright.Green}[Y]es [N]o{Color.White} {prompt} ")
+            if choice in yes_choices:
+                return True
+            elif choice in no_choices:
+                return False
+            else:
+                self._log("error", f"Invalid prompt answere, only {error_color}'yes' ('y'){Color.White} or {error_color}'no' ('n'){Color.White} are allowed!")
