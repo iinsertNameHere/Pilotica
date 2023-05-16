@@ -105,12 +105,12 @@ def compile(go_src_directory, output_binary_path, obfuscate=False, target_os='wi
 
 
 # Example usage
-src_directory = "./test/main.go"
-output_binary = "./test/out.bin"
+src_directory = "./instance/agentlab/agentica.go"
+output_binary = "./out"
 
 instance_path = os.path.abspath('./instance')
 
 downoad_latest_go()
 download_obfuscator()
 
-compile(src_directory, target_os='linux')
+compile(src_directory, output_binary, target_os='linux')

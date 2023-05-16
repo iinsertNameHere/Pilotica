@@ -54,20 +54,23 @@ def status():
     """
     if serviceConf["online"]:
         logger.success("Getting Service status (online)", "\n")
-        return Transport("online").dump()
+        return Transport("online", "out")
     else:
         logger.success("Getting Service status (offline)", "\n")
-        return Transport("offline").dump()
+        return Transport("offline", "out")
 
 @service.route("/bind", methods = {"POST"})
 def bind():
     """
     Function to bind a Agent to the server
     """
-    jdata: dict = json.loads(Transport(request.data.decode()).load())
+    try:
+        jdata: dict = json.loads(Transport(request.data.decode(), "in"))
+    except:
+        return Transport("FAILED", "out")
 
     if not was_given("uuid", jdata.keys()):
-        return Transport("FAILED").dump()
+        return Transport("FAILED", "out")
     uuid: str = jdata["uuid"]
 
     if Agent.exists(uuid):
@@ -76,7 +79,7 @@ def bind():
     
     else:
         if not was_given("hostname", jdata.keys()):
-            return Transport("FAILED").dump()
+            return Transport("FAILED", "out")
         hostname: str = jdata["hostname"]
 
         newAgent = Agent(uuid=uuid, hostname=hostname)
@@ -84,7 +87,7 @@ def bind():
         db.session.commit()
         logger.success(f"Added new Agent: {uuid}", "\n")
 
-    return Transport("OK").dump()
+    return Transport("OK", "out")
 
 @service.route("/task", methods = {"POST", "GET", "DELETE"})
 def task():
@@ -97,41 +100,44 @@ def task():
 
     if request.method == "DELETE":
         if not is_valid_key(request.headers.get("key")):
-            return Transport("FAILED").dump()
+            return Transport("FAILED", "out")
 
         try:
             id = int(request.args.get('id'))
         except:
             logger.error(f"Invalid id: {id}")
-            return Transport("FAILED").dump()
+            return Transport("FAILED", "out")
 
         Task.delete(id)
         logger.success(f"Deleted Task by id: {id}")
-        return Transport("OK").dump()
+        return Transport("OK", "out")
 
-    jdata: dict = json.loads(Transport(request.data.decode()).load())
+    try:
+        jdata: dict = json.loads(Transport(request.data.decode(), "in"))
+    except:
+        return Transport("FAILED", "out")
 
     if not was_given("uuid", jdata.keys()):
-        return Transport("FAILED").dump()
+        return Transport("FAILED", "out")
     uuid: str = jdata["uuid"]
 
     if not Agent.exists(uuid):
         logger.error(f"Agent {uuid} dose not exist!", "\n")
-        return Transport("FAILED").dump()
+        return Transport("FAILED", "out")
 
     if request.method == "POST":
         if not is_valid_key(request.headers.get("key")):
-            return Transport("FAILED").dump()
+            return Transport("FAILED", "out")
 
         if not was_given("task", jdata.keys()):
-            return Transport("FAILED").dump()
+            return Transport("FAILED", "out")
         jtask = jdata["task"]
         keys = jtask.keys()
     
         if not was_given("file", keys) or \
         not was_given("args", keys) or \
         not was_given("verbose", keys):
-            return Transport("FAILED").dump()
+            return Transport("FAILED", "out")
         file: str = jtask["file"]
         args: list[str] = json.dumps(jtask["args"])
         verbose: bool = jtask["verbose"]
@@ -142,7 +148,7 @@ def task():
         db.session.commit()
 
         logger.success(f"Added new Task for Agent: {uuid}", "\n")
-        return Transport(str(newTask.id)).dump()
+        return Transport(str(newTask.id), "out")
 
     elif request.method == "GET":
         Agent.update_beacon(uuid)
@@ -151,74 +157,77 @@ def task():
         task = Agent.get_nextTask(uuid)
 
         if task != None:
-            return Transport(task.jsonify()).dump()
+            return Transport(task.jsonify(), "out")
         else:
-            return Transport("NONE").dump()
+            return Transport("NONE", "out")
         
         
 
 @service.route("/reply", methods = {"POST", "GET"})
 def reply():
     if request.method == "POST":
-        jdata: dict = json.loads(Transport(request.data.decode()).load())
+        try:
+            jdata: dict = json.loads(Transport(request.data.decode(), "in"))
+        except:
+            return Transport("FAILED", "out")
 
         if not was_given("task_id", jdata.keys()):
-            return Transport("FAILED").dump()
+            return Transport("FAILED", "out")
         task_id: str = jdata["task_id"]
 
         if not was_given("uuid", jdata.keys()):
-            return Transport("FAILED").dump()
+            return Transport("FAILED", "out")
         uuid: str = jdata["uuid"]
 
         if not Agent.exists(uuid):
             logger.error(f"Agent {uuid} dose not exist!", "\n")
-            return Transport("FAILED").dump()
+            return Transport("FAILED", "out")
         Agent.update_beacon(uuid)
 
         if not was_given("content", jdata.keys()):
-            return Transport("FAILED").dump()
+            return Transport("FAILED", "out")
         content: str = jdata["content"]
 
         logger.success(f"Setting reply for Task: {task_id}", "\n")
         Task.get_by_id(task_id).set_reply(content)
 
-        return Transport("OK").dump()
+        return Transport("OK", "out")
 
     else:
         if not is_valid_key(request.headers.get("key")):
-            return Transport("FAILED").dump()
+            return Transport("FAILED", "out")
 
         try:
             id = int(request.args.get('id'))
         except:
             logger.error(f"Invalid id: {id}", "\n")
-            return Transport("FAILED").dump()
+            return Transport("FAILED", "out")
 
         if id is None:
             logger.error(f"No id was given!", "\n")
-            return Transport("FAILED").dump()
+            return Transport("FAILED", "out")
 
         task = Task.get_by_id(id)
         if task is None:
-            return Transport("NONE").dump()
+            return Transport("NONE", "out")
         else:
             logger.success(f"Getting reply of Task: {id}", "\n")
-            return  Transport(task.get_reply()).dump()
+            return  Transport(task.get_reply(), "out")
 
 @service.route("/agents", methods = {"GET", "DELETE"})
 def agents():
     if not current_user.is_authenticated:
         if not is_valid_key(request.headers.get("key")):
-            return Transport("FAILED").dump()
+            return Transport("FAILED", "out")
     else:
         if not current_user.role in [PilotRoles.ADMIN.get('name'), PilotRoles.OPERATOR.get('name')]:
             logger.success(f"current_pilot.role is not ADMIN or OPERATOR!", "\n")
-            return Transport("FAILED").dump()
+            return Transport("FAILED", "out")
 
     if request.method == "GET":
         agents = Agent.query.all()
         if agents is None:
-            return Transport("NONE").dump()
+            return Transport("NONE", "out")
 
         dict_repr = dict()
         for agent in agents:
@@ -227,61 +236,61 @@ def agents():
             dict_repr[str(agent.id)] = jagent
         
         logger.success(f"Getting all Agents!", "\n")
-        return Transport(json.dumps(dict_repr)).dump()
+        return Transport(json.dumps(dict_repr), "out")
 
     else:
         Agent.delete_all()
         logger.success(f"Deleted all Agents!", "\n")
-        return Transport("OK").dump()
+        return Transport("OK", "out")
 
 
 @service.route("/agent", methods = {"GET", "DELETE"})
 def agent():
     if not current_user.is_authenticated:
         if not is_valid_key(request.headers.get("key")):
-            return Transport("FAILED").dump()
+            return Transport("FAILED", "out")
     else:
         if not current_user.role in [PilotRoles.ADMIN.get('name'), PilotRoles.OPERATOR.get('name')]:
             logger.success(f"current_pilot.role is not ADMIN or OPERATOR!", "\n")
-            return Transport("FAILED").dump()
+            return Transport("FAILED", "out")
 
     try:
         id = int(request.args.get('id'))
     except:
         logger.error(f"Invalid id: {id}", "\n")
-        return Transport("FAILED").dump()
+        return Transport("FAILED", "out")
 
     if id is None:
         logger.error(f"No id was given!", "\n")
-        return Transport("FAILED").dump()
+        return Transport("FAILED", "out")
 
     if request.method == "GET":
         agent = Agent.query.filter_by(id=id).first()
         if agent is None:
             logger.error(f"No Agent found with id: {id}", "\n")
-            return Transport("FAILED").dump()
+            return Transport("FAILED", "out")
         logger.success(f"Getting Agent with id: {id}", "\n")
-        return Transport(agent.jsonify()).dump()
+        return Transport(agent.jsonify(), "out")
 
     else:        
         Agent.delete(id)
         logger.success(f"Deleted Agent by id: {id}", "\n")
-        return Transport("OK").dump()
+        return Transport("OK", "out")
 
 @service.route("/pilots", methods = {"GET", "DELETE"})
 def pilots():
     if not current_user.is_authenticated:
         if not is_valid_key(request.headers.get("key")):
-            return Transport("FAILED").dump()
+            return Transport("FAILED", "out")
     else:
         if not current_user.role == PilotRoles.ADMIN.get('name'):
             logger.success(f"current_pilot.role is not ADMIN!", "\n")
-            return Transport("FAILED").dump()
+            return Transport("FAILED", "out")
 
     if request.method == "GET":
         pilots = Pilot.query.all()
         if pilots is None:
-            return Transport("NONE").dump()
+            return Transport("NONE", "out")
 
         dict_repr = dict()
         for pilot in pilots:
@@ -290,50 +299,53 @@ def pilots():
             dict_repr[str(pilot.id)] = jpilot
 
         logger.success(f"Getting all Pilots!", "\n")
-        return Transport(json.dumps(dict_repr)).dump()
+        return Transport(json.dumps(dict_repr), "out")
 
     else:
         Pilot.delete_all()
         logger.success(f"Deleted all Pilots!", "\n")
-        return Transport("OK").dump()
+        return Transport("OK", "out")
 
 
 @service.route("/pilot", methods = {"GET", "DELETE", "PUT"})
 def pilot():
     if not current_user.is_authenticated:
         if not is_valid_key(request.headers.get("key")):
-            return Transport("FAILED").dump()
+            return Transport("FAILED", "out")
     else:
         if not current_user.role == PilotRoles.ADMIN.get('name'):
             logger.success(f"current_pilot.role is not ADMIN!", "\n")
-            return Transport("FAILED").dump()
+            return Transport("FAILED", "out")
 
     try:
         id = int(request.args.get('id'))
     except:
         logger.error(f"Invalid id: {id}", "\n")
-        return Transport("FAILED").dump()
+        return Transport("FAILED", "out")
 
     if id is None:
         logger.error(f"No id was given!", "\n")
-        return Transport("FAILED").dump()
+        return Transport("FAILED", "out")
 
     if request.method == "GET":
         pilot = Pilot.query.filter_by(id=id).first()
         if pilot is None:
             logger.error(f"No Pilot found with id: {id}", "\n")
-            return Transport("FAILED").dump()
+            return Transport("FAILED", "out")
         logger.success(f"Getting Pilot with id: {id}", "\n")
-        return Transport(pilot.jsonify()).dump()
+        return Transport(pilot.jsonify(), "out")
 
     elif request.method == "PUT":
-        jdata: dict = json.loads(Transport(request.data.decode()).load())
+        try:
+            jdata: dict = json.loads(Transport(request.data.decode(), "in"))
+        except:
+            return Transport("FAILED", "out")
         keys = jdata.keys()
         if not was_given("id", keys) or \
         not was_given("name", keys) or \
         not was_given("pwd_hash", keys) or \
         not was_given("role", keys):
-            return Transport("FAILED").dump()
+            return Transport("FAILED", "out")
         id: int = int(jdata["id"])
         name: str = jdata["name"]
         pwd_hash: str = json.dumps(jdata["pwd_hash"])
@@ -344,7 +356,7 @@ def pilot():
             if pilot:
                 if pilot.id != id:
                     logger.error(f"Pilot with name '{name}' alredy exists!", "\n")
-                    return Transport("FAILED").dump()
+                    return Transport("FAILED", "out")
 
             pilot: Pilot = Pilot.query.filter_by(id=id).first()
             pilot.name = name
@@ -354,13 +366,13 @@ def pilot():
             db.session.commit()
 
             logger.success(f"Updating Pilot with id: {id}", "\n")
-            return Transport("OK").dump()
+            return Transport("OK", "out")
         else:
             serviceConf["logging"]: print(f"{Color.Red}::{Color.White} Pilot with id '{id}' dose not exist!", "\n")
-            return Transport("FAILED").dump()
+            return Transport("FAILED", "out")
 
     else:        
         Pilot.delete(id)
         logger.success(f"Deleted Pilot by id: {id}", "\n")
-        return Transport("OK").dump()
+        return Transport("OK", "out")
 

@@ -1,13 +1,9 @@
 from ..components.decorators import *
 
-class Transport:
-    @EnableComponents(globals(), "transport", args=["data"])
-    def __init__(self, data: str):
-        HANDLE_PCPKGS
-        self.data = component_returns[0]
-    
-    def dump(self):
-        return self.data
-
-    def load(self):
-        return self.data
+@EnableComponents(globals(), "transport", args=["data", "direction"])
+def Transport(data, direction="in"): # in out
+    HANDLE_PCPKGS
+    retlen = len(component_returns)
+    if retlen > 0:
+        data = component_returns[retlen-1]
+    return data

@@ -16,9 +16,9 @@ port = 4444
 app, config = (None, None)
 
 @EnableComponents(globals(), "core")
-def main():
+def main(db_name):
     global app, config
-    app, config = setup_app(__name__)
+    app, config = setup_app(__name__, db_name)
 
     if not config.pilotica.get("DEBUG"):
         if os.name == 'nt':
@@ -43,9 +43,10 @@ if __name__ == "__main__":
 
     parser.add_argument('--no-components', help='Starts Pilotica without loading Component-Packages',
         required=False, action='store_true', default=False)
+    parser.add_argument('--db-name', help='Name of the db to use for this session', required=False, default="session.db")
 
     args = parser.parse_args()
 
     ps.no_components = args.no_components
 
-    main()
+    main(args.db_name)

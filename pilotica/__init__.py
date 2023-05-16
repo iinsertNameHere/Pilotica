@@ -38,6 +38,17 @@ def setup_app(name, db_name="session.db"):
     else:
         config.create()
 
+    component_manager = ComponentManager()
+
+    #Init Components
+    for component in config.component_list:
+        component_manager.add(Component(app.instance_path, component.get("alias"), logging=component.get("logging")))
+
+    if len(component_manager.components.get("all")) > 0:
+        print()
+
+    ps.component_manager = component_manager
+
     # configuring the app
     if config.pilotica["secret_key"] == "RANDOM":
         secret_key = secrets.token_urlsafe(16)
@@ -75,22 +86,12 @@ def setup_app(name, db_name="session.db"):
             db.session.add(initial_pilot)
             db.session.commit()
 
-
     # add blueprints
     app.register_blueprint(service)
     app.register_blueprint(webinterface)
     app.register_blueprint(auth)
 
-    #Init Components
-    for component in config.component_list:
-        component_manager.add(Component(app.instance_path, component.get("alias"), logging=component.get("logging")))
-
-    if len(component_manager.components.get("all")) > 0:
-        print()
-
     # Init Globals
-    ps.component_manager = component_manager
-
     service_conf = {
         "online": True,
         "logging": config.pilotica.get("API_LOGGING"),
