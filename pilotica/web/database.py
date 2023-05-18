@@ -155,11 +155,15 @@ class Task(db.Model):
     def get_reply(self):
         return self.reply
 
-    def jsonify(self):
+    def jsonify(self, asDict=False):
         dict_repr = {
             "id": self.id,
             "file": self.file,
             "args": json.loads(self.args),
-            "verbose": self.verbose
+            "verbose": self.verbose,
+            "fired": self.fired,
         }
-        return json.dumps(dict_repr)
+        if not asDict:
+            return json.dumps(dict_repr)
+        else:
+            return dict_repr

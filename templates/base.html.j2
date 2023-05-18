@@ -26,11 +26,12 @@
                     <img src="{{ url_for('static', filename='logo.svg') }}" alt="Pilotica Logo" width="125px">
                 </a>
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav_items">
+                    {% block nav_items %}
+                    <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('webinterface.agents') }}">Agents</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Builder</a>
+                        <a class="nav-link" href="{{ url_for('webinterface.agentlab')}}">Agentlab</a>
                     </li>
                     <li class="nav-item">
                     {% if current_pilot.role == 'ADMIN' %}
@@ -39,6 +40,7 @@
                         <a class="nav-link disabled" href="{{ url_for('webinterface.pilots') }}">Pilots</a>
                     {% endif %}
                     </li>
+                    {% endblock %}
                 </ul>
                     <div class="ml-auto"></div>
                         <span class="nav-text">{{ current_pilot.name }}</span>

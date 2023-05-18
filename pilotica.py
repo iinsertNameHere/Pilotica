@@ -16,9 +16,12 @@ port = 4444
 app, config = (None, None)
 
 @EnableComponents(globals(), "core")
-def main(db_name):
+def main(db_name, debug):
     global app, config
     app, config = setup_app(__name__, db_name)
+
+    if debug != None:
+        config.pilotica["DEBUG"] = ps.str2bool(debug)
 
     if not config.pilotica.get("DEBUG"):
         if os.name == 'nt':
@@ -44,9 +47,17 @@ if __name__ == "__main__":
     parser.add_argument('--no-components', help='Starts Pilotica without loading Component-Packages',
         required=False, action='store_true', default=False)
     parser.add_argument('--db-name', help='Name of the db to use for this session', required=False, default="session.db")
-
+    parser.add_argument('--port', help="Define port to start on", required=False, default="4444")
+    parser.add_argument('--debug', help="Ignore config debug setting and uses this one insted", choices=["true", "false"], default=None, required=False)
+    
     args = parser.parse_args()
+
+    try:
+        port = int(args.port)
+    except:
+        print(f"ERROR: '{args.port}' is not a valid port number, using default!")
+        port = 4444
 
     ps.no_components = args.no_components
 
-    main(args.db_name)
+    main(args.db_name, args.debug)

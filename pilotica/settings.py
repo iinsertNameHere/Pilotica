@@ -11,3 +11,9 @@ login_manager.login_view = "auth.login"
 login_manager.login_message_category = "info"
 
 no_components = False
+
+def str2bool(value: str) -> bool:
+    if value.lower() == "true":
+        return True
+    else:
+        return False

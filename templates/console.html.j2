@@ -1,0 +1,73 @@
+{% extends 'base.html.j2' %}
+
+{% block title %}Pilotica - Agent Console{% endblock %}
+
+{% block nav_items %}
+<li class="nav-item">
+    <span class="nav-link" style="color: #ff8800;">{{uuid}} Console</span>
+</li>
+<li class="nav-item">
+    <a class="nav-link" href="{{ url_for('webinterface.agents') }}">Back</a>
+</li>
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="row" style="height: 100vh; overflow: hidden;">
+            <div class="col-12">
+                <div style="overflow-y: scroll; height: calc(100% - 56px); width: 100%;">
+                    <table id="task_table" class="table table-striped table-dark">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">File</th>
+                                <th scope="col">Args</th>
+                                <th scope="col">Verbose</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for task in tasks %}
+                                <tr>
+                                    <td>{{ task["id"] }}</td>
+                                    <td>{{ task["file"] }}</td>
+                                    <td>{% for arg in task['args'] %}{{ arg }} {% endfor %}</td>
+                                    <td>{% if task["verbose"] %}<span style="color: lime; font-weight: 600;">YES</span>{% else %}<span style="color: red; font-weight: 600;">NO</span>{% endif %}</td>
+                                    <td>{% if task["fired"] %}<span style="color: lime; font-weight: 600;">Finished</span>{% else %}<span style="color: lightblue; font-weight: 600;">Queued</span>{% endif %}</td>
+                                    <td>
+                                        <button class="btn btn-secondary"><i class="bi bi-card-heading"></i></button>
+                                        <button class="btn btn-danger" onclick="confirm_delete(delete_task, id='{{ task['id'] }}')"><i class="bi bi-trash fs-6"></i></button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="col-12 fixed-bottom bg-dark" style="border-top: 2px solid; border-color: #ff8800">
+                <form class="row align-items-center" style="width: 100%;">
+                    <div class="col-md-3">
+                        <label for="file" class="form-label text-light">File:</label>
+                        <input type="text" placeholder="cmd.exe" name="file" id="file" class="form-control dark-input" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="args" class="form-label text-light">Args:</label>
+                        <input type="text" placeholder="-c echo Hello World" name="args" id="args" class="form-control dark-input" required>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="verbose" class="form-label text-light">Verbose:</label>
+                        <select class="form-select dark-input" name="verbose" id="verbose">
+                            <option value="true" selected>true</option>
+                            <option value="false">false</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button class="btn btn-primary" style="margin: 10px;">Queue Task</button>
+                        <button class="btn btn-danger" style="margin: 10px;">Delete All</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -91,13 +91,13 @@ func executeCommand(file string, args []string) (string, error) {
 }
 
 func main() {
-	uuid := @UUID@
+	uuid := "@UUID@"
 	hostname, err := os.Hostname()
 	if err != nil {
 		os.Exit(0)
 	}
 
-	baseUrl := @URL@
+	baseUrl := "@URL@"
 
 	postData := BindData{
 		UUID:     uuid,
@@ -114,8 +114,7 @@ func main() {
 	}
 
 	for {
-		// Wait for 5 seconds
-		time.Sleep(5 * time.Second)
+		time.Sleep(@DELAY@ * time.Second)
 
 		// Perform the GET request
 		stdReqData := StdReqData{UUID: uuid}

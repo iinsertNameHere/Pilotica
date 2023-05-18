@@ -29,6 +29,8 @@ def setup_app(name, db_name="session.db"):
     # create the app
     app = CustomFlask(name)
 
+    ps.instance_path = app.instance_path
+
     # setting up yaml config
     config_path = os.path.join(app.instance_path, "config", "config.yaml")
     config = Config(app.instance_path, config_path)
@@ -77,8 +79,6 @@ def setup_app(name, db_name="session.db"):
     except OSError:
         pass
 
-    ps.instance_path = app.instance_path
-
     # create pilots
     with app.app_context():
         if not len(Pilot.query.all()) > 0:
@@ -102,12 +102,12 @@ def setup_app(name, db_name="session.db"):
     @app.route("/transport/load", methods = {'GET'})
     def transport_load():
         data = request.args.get("data")
-        return Transport(data).load()
+        return Transport(data, "in")
 
     @app.route("/transport/dump", methods = {'GET'})
     def transport_dump():
         data = request.args.get("data")
-        return Transport(data).dump()
+        return Transport(data, "out")
 
     @app.route("/")
     def index():

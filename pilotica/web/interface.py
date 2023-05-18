@@ -1,9 +1,12 @@
 from flask import Blueprint
 from flask import request
 import json
+import glob
 
-from ..settings import secret_key
+import os
+
 from ..console import Color
+import pilotica.agentlab as al
 
 from .database import *
 from .transport import Transport
@@ -88,3 +91,70 @@ def pilots():
     else:
         flash("You don't have have the right permissions!", 'danger')
         return redirect(url_for('webinterface.agents'))
+
+@webinterface.route("/get_values", methods={'GET'})
+@login_required
+def get_values():
+    from ..settings import instance_path
+    src = os.path.join(instance_path, "agentlab", request.args.get('name'))
+    return json.dumps(al.get_values(src))
+
+@webinterface.route("/agentlab", methods={"GET"})
+@login_required
+def agentlab():
+    from ..settings import instance_path
+    path = os.path.join(instance_path, "agentlab", "build")
+    binarys = os.listdir(path)
+    enumBin = enumerate(binarys)
+    if len(binarys) < 1:
+        enumBin = list()
+    return render_template("agentlab.html.j2", binarys=enumBin, current_pilot=current_user)
+    
+
+@webinterface.route("/builder", methods={"POST", "GET"})
+@login_required
+def builder():
+    from ..settings import instance_path, str2bool
+    if request.method == "GET":
+        if current_user.role in [PilotRoles.ADMIN["name"], PilotRoles.OPERATOR["name"]]:
+            path = os.path.join(instance_path, "agentlab")
+            files = os.listdir(path)
+            sources = list()
+            for file in files:
+                if file.endswith('.go'):
+                    sources.append(file)
+            sources = enumerate(sources)
+            return render_template('builder.html.j2', sources=sources, current_pilot=current_user)
+        else:
+            flash("You don't have have the right permissions!", 'danger')
+            return redirect(url_for('webinterface.agents'))
+    else:
+        src = os.path.join(instance_path, "agentlab", request.form.get('src'))
+        out = os.path.join(instance_path, "agentlab", "build", request.form.get('name'))
+        target_os = request.form.get('target_os')
+        obfuscate = str2bool(request.form.get('obfuscate'))
+
+        al.downoad_latest_go()
+        print()
+        al.download_obfuscator()
+
+        print()
+        values = None
+        keys = al.get_values(src).keys()
+        if len(keys) > 0:
+            values = dict()
+            for key in keys:
+                values[key] = request.form.get(key)
+
+        if al.compile_go(src, out, obfuscate, target_os, values):
+            flash("Agent Compiled successfilly and is ready for download!", 'primary')
+        else:
+            flash("Agent Compilation Failed, please contact the server admin!", 'danger')
+
+        return redirect(url_for('webinterface.agentlab'))
+
+@webinterface.route("/<string:agent_uuid>/console")
+@login_required
+def agent_console(agent_uuid):
+    tasks = [task.jsonify(True) for task in Agent.get_by_uuid(agent_uuid).tasks]
+    return render_template("console.html.j2", uuid=agent_uuid, tasks=tasks, current_pilot=current_user)

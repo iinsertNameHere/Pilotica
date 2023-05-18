@@ -13,7 +13,7 @@
                         <th scope="col">UUID</th>
                         <th scope="col">Hostname</th>
                         <th scope="col">Last Seen</th>
-                        <th scope="col">Queued Tasks</th>
+                        <th scope="col">Task Count</th>
                         <th scope="col">Actions</th>
                     </tr>
                 </thead>
@@ -26,7 +26,7 @@
                             <td>{{ agent["beacon"] }}</td>
                             <td>{{ agent["task_count"] }}</td>
                             <td>
-                                <button class="btn btn-secondary"><i class="bi bi-terminal"></i></button>
+                                <button class="btn btn-secondary", onclick="window.location.href='{{ url_for('webinterface.agent_console', agent_uuid=agent['uuid']) }}'"><i class="bi bi-terminal"></i></button>
                                 <button class="btn btn-danger" onclick="confirm_delete(delete_agent, id='{{ agent['id'] }}')"><i class="bi bi-trash fs-6"></i></button>
                             </td>
                         </tr>

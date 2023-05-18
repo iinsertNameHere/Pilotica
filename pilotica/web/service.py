@@ -1,4 +1,4 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, send_from_directory
 from flask_login import current_user
 import json
 
@@ -8,6 +8,9 @@ from ..console import Color, Logger
 from .database import *
 from .transport import Transport
 from .pilots import PilotRoles
+
+import os
+import shutil
 
 import __main__
 
@@ -208,11 +211,12 @@ def reply():
             return Transport("FAILED", "out")
 
         task = Task.get_by_id(id)
-        if task is None:
+        if task is None or task.get_reply() is None:
             return Transport("NONE", "out")
         else:
             logger.success(f"Getting reply of Task: {id}", "\n")
-            return  Transport(task.get_reply(), "out")
+            print(task.get_reply())
+            return Transport(task.get_reply(), "out")
 
 @service.route("/agents", methods = {"GET", "DELETE"})
 def agents():
@@ -355,7 +359,7 @@ def pilot():
             pilot = Pilot.query.filter_by(name=name).first()
             if pilot:
                 if pilot.id != id:
-                    logger.error(f"Pilot with name '{name}' alredy exists!", "\n")
+                    serviceConf["logging"]: logger.error(f"Pilot with name '{name}' alredy exists!", "\n")
                     return Transport("FAILED", "out")
 
             pilot: Pilot = Pilot.query.filter_by(id=id).first()
@@ -373,6 +377,43 @@ def pilot():
 
     else:        
         Pilot.delete(id)
-        logger.success(f"Deleted Pilot by id: {id}", "\n")
+        serviceConf["logging"]: logger.success(f"Deleted Pilot by id: {id}", "\n")
         return Transport("OK", "out")
 
+@service.route("/downloadbin")
+def downloadbin():
+    if not current_user.is_authenticated:
+        if not is_valid_key(request.headers.get("key")):
+            return Transport("FAILED", "out")
+
+    from ..settings import instance_path
+
+    filename = request.args.get('filename')
+
+    if os.path.exists(os.path.join(instance_path, "agentlab", "build", filename)):
+        return send_from_directory(directory=os.path.join(instance_path, "agentlab", "build"), path=filename)
+    else:
+        return Transport("Dose not Exist!", "out")
+
+@service.route("/deletebin", methods={"DELETE"})
+def deletebin():
+    if not current_user.is_authenticated:
+        if not is_valid_key(request.headers.get("key")):
+            return Transport("FAILED", "out")
+
+    from ..settings import instance_path
+
+    filename = request.args.get("filename")
+    if filename == "all":#from ..settings import instance_path
+        path = os.path.join(instance_path, "agentlab", "build")
+        binarys = [os.path.join(path, file) for file in os.listdir(path)]
+        for binary in binarys:
+            os.remove(binary)
+        return Transport("OK", "out")
+    else:
+        binary = os.path.join(instance_path, "agentlab", "build", filename)
+        if os.path.exists(binary):
+            os.remove(binary)
+            return Transport("OK", "out")
+        else:
+            return Transport("FAILED", "out")

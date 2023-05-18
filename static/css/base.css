@@ -19,6 +19,12 @@ button {
     color: white;    
 }
 
+.dark-input {
+    background-color: #303030 !important;
+    border-color: #303030 !important; 
+    color: white !important;
+}
+
 .alert {
     position: fixed;
     top: 0;
