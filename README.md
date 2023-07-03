@@ -6,6 +6,7 @@
 </h1>
 
 <h4 align="center">A post exploitation framework build on <a href="https://flask.palletsprojects.com">Flask</a>.</h4>
+<h4 align="center">Developed for the sake of learning about post exploitation!!!</h4>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.10-green?style=flat" alt="Python" />
