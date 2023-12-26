@@ -128,13 +128,19 @@ class Agent(db.Model):
 
 class Task(db.Model):
     __tablename__ = "tasks"
-    id       = db.Column(db.Integer, primary_key=True)
-    file     = db.Column(db.String(64), nullable=False)
-    args     = db.Column(db.Text, nullable=True)
-    fired    = db.Column(db.Boolean, nullable=False, default=False)
-    verbose  = db.Column(db.Boolean, nullable=False, default=False)
-    reply    = db.Column(db.Text, nullable=True, default=None)
-    agent_id = db.Column(db.Integer, db.ForeignKey('agents.id'), nullable=False)
+    id         = db.Column(db.Integer, primary_key=True)
+    command    = db.Column(db.Text, nullable=False)
+    args       = db.Column(db.Text, nullable=True)
+    victim     = db.Column(db.String(30), nullable=False)
+    operator   = db.Column(db.String(30), nullable=False)
+    delay      = db.Column(db.Integer, nullable=False)
+    execTime   = db.Column(db.Integer, nullable=False)
+    file       = db.Column(db.String(30), nullable=True)
+    usesmb     = db.Column(db.String(30), nullable=True)
+    actsmb     = db.Column(db.String(30), nullable=True)
+    fired      = db.Column(db.Boolean, nullable=False, default=False)
+    reply      = db.Column(db.Text, nullable=True, default=None)
+    agent_id   = db.Column(db.Integer, db.ForeignKey('agents.id'), nullable=False)
 
     def delete(id: int):
         task = Task.query.filter_by(id=id).first()
@@ -158,10 +164,16 @@ class Task(db.Model):
     def jsonify(self, asDict=False):
         dict_repr = {
             "id": self.id,
+            "command": self.command,
+            "args": self.args,
+            "victim": self.victim,
+            "operator": self.operator,
+            "delay": self.delay,
+            "execTime": self.execTime,
             "file": self.file,
-            "args": json.loads(self.args),
-            "verbose": self.verbose,
-            "fired": self.fired,
+            "usesmb": self.usesmb,
+            "actsmb": self.actsmb,
+            "fired": self.fired
         }
         if not asDict:
             return json.dumps(dict_repr)
