@@ -27,7 +27,7 @@ def downoad_latest_go():
 
     logger.info("Updating to latest go version...")
 
-    go_version = requests.get("https://go.dev/VERSION?m=text").text
+    go_version = requests.get("https://go.dev/VERSION?m=text").text.split("\n")[0]
 
     from .settings import instance_path
     versionfile = os.path.join(instance_path, 'GOVERSION.txt')
@@ -41,9 +41,9 @@ def downoad_latest_go():
 
     # Download the Go release file
     if os.name == 'nt':
-        response = requests.get("https://golang.org/dl/go1.21.5.windows-amd64.zip", stream=True)
+        response = requests.get(f"https://golang.org/dl/{go_version}.windows-amd64.zip", stream=True)
     else:
-        url = f"https://golang.org/dl/go1.21.5.linux-amd64.tar.gz"
+        url = f"https://golang.org/dl/{go_version}.linux-amd64.tar.gz"
         response = requests.get(url, stream=True)
     file_size = int(response.headers.get("Content-Length", 0))
     file_path = os.path.join(instance_path, f"latest-go.{'zip' if os.name == 'nt' else 'tar.gz'}")
