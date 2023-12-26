@@ -38,11 +38,13 @@ def downoad_latest_go():
         if version == go_version:
             logger.info("Go version is up to date!")
             return
-    # Get the download URL for the latest Go release
-    url = f"https://golang.org/dl/{go_version}.{'windows-amd64.zip' if os.name == 'nt' else 'linux-amd64.tar.gz'}"
 
     # Download the Go release file
-    response = requests.get(url, stream=True)
+    if os.name == 'nt':
+        response = requests.get("https://golang.org/dl/go1.21.5.windows-amd64.zip", stream=True)
+    else:
+        url = f"https://golang.org/dl/go1.21.5.linux-amd64.tar.gz"
+        response = requests.get(url, stream=True)
     file_size = int(response.headers.get("Content-Length", 0))
     file_path = os.path.join(instance_path, f"latest-go.{'zip' if os.name == 'nt' else 'tar.gz'}")
 
@@ -63,6 +65,7 @@ def downoad_latest_go():
     logger.success(f"{go_version} downloaded successfully")
 
     logger.info('Extracting go archive...')
+    print(f"Golang Zip Path: {file_path}")
     
     try:
         if os.name != 'nt':

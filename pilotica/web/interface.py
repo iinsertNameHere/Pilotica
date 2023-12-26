@@ -103,7 +103,7 @@ def get_values():
 @login_required
 def agentlab():
     from ..settings import instance_path
-    path = os.path.join(instance_path, "agentlab", "build")
+    path = os.path.join(instance_path, "agentlab")
     binarys = os.listdir(path)
     enumBin = enumerate(binarys)
     if len(binarys) < 1:
