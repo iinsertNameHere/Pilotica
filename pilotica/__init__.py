@@ -111,6 +111,6 @@ def setup_app(name, db_name="session.db"):
 
     @app.route("/")
     def index():
-        return redirect(url_for('webinterface.agents'))
+        return redirect(url_for('webinterface.dashboard'))
 
     return app, config

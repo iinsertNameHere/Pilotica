@@ -15,6 +15,7 @@ from .operators import OperatorRoles
 
 from flask import render_template, redirect, url_for, flash
 from flask_login import login_required, current_user
+from datetime import datetime
 
 from werkzeug.security import generate_password_hash
 
@@ -24,7 +25,7 @@ webinterface = Blueprint("webinterface", __name__, url_prefix="/interface")
 @webinterface.route("")
 @webinterface.route("/")
 def interface():
-    return redirect(url_for('webinterface.agents'))
+    return redirect(url_for('webinterface.dashboard'))
 
 @webinterface.route("/agents", methods = {'GET'})
 @login_required
@@ -51,6 +52,38 @@ def new_operator():
     else:
         flash("Passwords dont match!", 'danger')
     return redirect(url_for('webinterface.operators'))
+
+@webinterface.route("/dashboard")
+@login_required
+def dashboard():
+    def percentage(part, whole):
+        if part == 0:
+            return 0
+        return int(100 * float(part)/float(whole))
+
+    agents: list[Agent]       = Agent.query.all()
+    online: list[Agent]       = []
+    for agent in agents:
+        delta = datetime.utcnow() - agent.beacon
+        if delta.seconds <= 60:
+            online.append(agent)
+    
+    tasks: list[Tasks]        = Task.query.all()
+    finished: list[Tasks]     = Task.query.filter_by(fired=True).all()
+    mytasks: list[Tasks]      = Task.query.filter_by(operator = current_user.name).all()
+    myfinished: list[Tasks]      = Task.query.filter_by(operator = current_user.name).filter_by(fired=True).all()
+    operators: list[Operator] = Operator.query.all()
+
+    return render_template("dashboard.html.j2",
+        agent_count=len(agents),
+        online_average=percentage(len(online), len(agents)),
+        task_count=len(tasks),
+        finished_average=percentage(len(finished), len(tasks)),
+        mytask_count=len(mytasks),
+        myfinished_average=percentage(len(myfinished), len(mytasks)),
+        operator_count=len(operators),
+        current_operator=current_user
+    )
 
 @webinterface.route("/operators/edit", methods = {'POST'})
 @login_required
