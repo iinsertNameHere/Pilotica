@@ -14,11 +14,11 @@ from .web.transport import Transport
 from .web.service import service, init_service, __main__ as __service_main__
 from .web.interface import webinterface
 from .web.auth import auth
-from .web.database import db, Pilot
+from .web.database import db, Operator
 
 # pilotica imports
 import pilotica.settings as ps
-import pilotica.web.pilots as pilots
+import pilotica.web.operators as operators
 from .config import Config
 from .console import Color
 from .components.engine import ComponentManager, Component
@@ -64,7 +64,7 @@ def setup_app(name, db_name="session.db"):
 
     @ps.login_manager.user_loader
     def load_user(id):
-        return Pilot.query.get(int(id))
+        return Operator.query.get(int(id))
 
     ps.secret_key = secret_key
 
@@ -79,11 +79,11 @@ def setup_app(name, db_name="session.db"):
     except OSError:
         pass
 
-    # create pilots
+    # create Operators
     with app.app_context():
-        if not len(Pilot.query.all()) > 0:
-            initial_pilot = Pilot(name="adminpilot", pwd_hash=generate_password_hash("admin"), role='ADMIN')
-            db.session.add(initial_pilot)
+        if not len(Operator.query.all()) > 0:
+            initial_operator = Operator(name="admin", pwd_hash=generate_password_hash("admin"), role='ADMIN')
+            db.session.add(initial_operator)
             db.session.commit()
 
     # add blueprints

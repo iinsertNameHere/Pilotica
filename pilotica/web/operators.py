@@ -1,4 +1,4 @@
-class __pilot_roles__:
+class __operator_roles__:
     def __init__(self):
         # r = read
         # w = write
@@ -7,4 +7,4 @@ class __pilot_roles__:
         self.OPERATOR = {"name": "OPERATOR", "rights": ['r', 'w']}
         self.ADMIN    = {"name": "ADMIN", "rights": ['r', 'w', 'c']}
 
-PilotRoles = __pilot_roles__()
+OperatorRoles = __operator_roles__()

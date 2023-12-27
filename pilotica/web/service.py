@@ -7,7 +7,7 @@ from ..console import Color, Logger
 
 from .database import *
 from .transport import Transport
-from .pilots import PilotRoles
+from .operators import OperatorRoles
 
 import os
 import shutil
@@ -246,8 +246,8 @@ def agents():
         if not is_valid_key(request.headers.get("key")):
             return Transport("FAILED", "out")
     else:
-        if not current_user.role in [PilotRoles.ADMIN.get('name'), PilotRoles.OPERATOR.get('name')]:
-            logger.success(f"current_pilot.role is not ADMIN or OPERATOR!", "\n")
+        if not current_user.role in [OperatorRoles.ADMIN.get('name'), OperatorRoles.OPERATOR.get('name')]:
+            logger.error(f"current_operator.role is not ADMIN or OPERATOR!", "\n")
             return Transport("FAILED", "out")
 
     if request.method == "GET":
@@ -276,8 +276,8 @@ def agent():
         if not is_valid_key(request.headers.get("key")):
             return Transport("FAILED", "out")
     else:
-        if not current_user.role in [PilotRoles.ADMIN.get('name'), PilotRoles.OPERATOR.get('name')]:
-            logger.success(f"current_pilot.role is not ADMIN or OPERATOR!", "\n")
+        if not current_user.role in [OperatorRoles.ADMIN.get('name'), OperatorRoles.OPERATOR.get('name')]:
+            logger.error(f"current_operator.role is not ADMIN or OPERATOR!", "\n")
             return Transport("FAILED", "out")
 
     try:
@@ -303,44 +303,44 @@ def agent():
         logger.success(f"Deleted Agent by id: {id}", "\n")
         return Transport("OK", "out")
 
-@service.route("/pilots", methods = {"GET", "DELETE"})
-def pilots():
+@service.route("/operators", methods = {"GET", "DELETE"})
+def operators():
     if not current_user.is_authenticated:
         if not is_valid_key(request.headers.get("key")):
             return Transport("FAILED", "out")
     else:
-        if not current_user.role == PilotRoles.ADMIN.get('name'):
-            logger.success(f"current_pilot.role is not ADMIN!", "\n")
+        if not current_user.role == OperatorRoles.ADMIN.get('name'):
+            logger.success(f"current_operator.role is not ADMIN!", "\n")
             return Transport("FAILED", "out")
 
     if request.method == "GET":
-        pilots = Pilot.query.all()
-        if pilots is None:
+        operators = Operator.query.all()
+        if operators is None:
             return Transport("NONE", "out")
 
         dict_repr = dict()
-        for pilot in pilots:
-            jpilot: dict = pilot.jsonify(asDict=True)
-            jpilot.pop('id')
-            dict_repr[str(pilot.id)] = jpilot
+        for operator in operators:
+            joperator: dict = operator.jsonify(asDict=True)
+            joperator.pop('id')
+            dict_repr[str(operator.id)] = joperator
 
-        logger.success(f"Getting all Pilots!", "\n")
+        logger.success(f"Getting all Operators!", "\n")
         return Transport(json.dumps(dict_repr), "out")
 
     else:
-        Pilot.delete_all()
-        logger.success(f"Deleted all Pilots!", "\n")
+        Operator.delete_all()
+        logger.success(f"Deleted all Operators!", "\n")
         return Transport("OK", "out")
 
 
-@service.route("/pilot", methods = {"GET", "DELETE", "PUT"})
-def pilot():
+@service.route("/operator", methods = {"GET", "DELETE", "PUT"})
+def operator():
     if not current_user.is_authenticated:
         if not is_valid_key(request.headers.get("key")):
             return Transport("FAILED", "out")
     else:
-        if not current_user.role == PilotRoles.ADMIN.get('name'):
-            logger.success(f"current_pilot.role is not ADMIN!", "\n")
+        if not current_user.role == OperatorRoles.ADMIN.get('name'):
+            logger.success(f"current_operator.role is not ADMIN!", "\n")
             return Transport("FAILED", "out")
 
     try:
@@ -354,12 +354,12 @@ def pilot():
         return Transport("FAILED", "out")
 
     if request.method == "GET":
-        pilot = Pilot.query.filter_by(id=id).first()
-        if pilot is None:
-            logger.error(f"No Pilot found with id: {id}", "\n")
+        operator = Operator.query.filter_by(id=id).first()
+        if operator is None:
+            logger.error(f"No Operator found with id: {id}", "\n")
             return Transport("FAILED", "out")
-        logger.success(f"Getting Pilot with id: {id}", "\n")
-        return Transport(pilot.jsonify(), "out")
+        logger.success(f"Getting Operator with id: {id}", "\n")
+        return Transport(operator.jsonify(), "out")
 
     elif request.method == "PUT":
         try:
@@ -377,29 +377,29 @@ def pilot():
         pwd_hash: str = json.dumps(jdata["pwd_hash"])
         role: str = jdata["role"]
 
-        if Pilot.exists(id=id):
-            pilot = Pilot.query.filter_by(name=name).first()
-            if pilot:
-                if pilot.id != id:
-                    serviceConf["logging"]: logger.error(f"Pilot with name '{name}' alredy exists!", "\n")
+        if Operator.exists(id=id):
+            operator = Operator.query.filter_by(name=name).first()
+            if operator:
+                if operator.id != id:
+                    serviceConf["logging"]: logger.error(f"Operator with name '{name}' alredy exists!", "\n")
                     return Transport("FAILED", "out")
 
-            pilot: Pilot = Pilot.query.filter_by(id=id).first()
-            pilot.name = name
-            pilot.pwd_hash = pwd_hash
-            pilot.role = role
+            operator: Operator = Operator.query.filter_by(id=id).first()
+            operator.name = name
+            operator.pwd_hash = pwd_hash
+            operator.role = role
             
             db.session.commit()
 
-            logger.success(f"Updating Pilot with id: {id}", "\n")
+            logger.success(f"Updating Operator with id: {id}", "\n")
             return Transport("OK", "out")
         else:
-            serviceConf["logging"]: print(f"{Color.Red}::{Color.White} Pilot with id '{id}' dose not exist!", "\n")
+            serviceConf["logging"]: print(f"{Color.Red}::{Color.White} Operator with id '{id}' dose not exist!", "\n")
             return Transport("FAILED", "out")
 
     else:        
-        Pilot.delete(id)
-        serviceConf["logging"]: logger.success(f"Deleted Pilot by id: {id}", "\n")
+        Operator.delete(id)
+        serviceConf["logging"]: logger.success(f"Deleted Operator by id: {id}", "\n")
         return Transport("OK", "out")
 
 @service.route("/downloadbin")

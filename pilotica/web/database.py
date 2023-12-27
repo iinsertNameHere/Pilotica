@@ -5,8 +5,8 @@ import json
 
 db = SQLAlchemy()
 
-class Pilot(UserMixin, db.Model):
-    __tablename__ = "pilots"
+class Operator(UserMixin, db.Model):
+    __tablename__ = "operators"
     id            = db.Column(db.Integer, primary_key=True)
     name          = db.Column(db.String(20), nullable=False, unique=True)
     pwd_hash      = db.Column(db.Text, nullable=False)
@@ -17,21 +17,21 @@ class Pilot(UserMixin, db.Model):
             return False
     
         if name != None:
-            pilot = Pilot.query.filter_by(name=name).first()
+            operator = Operator.query.filter_by(name=name).first()
         else:
-            pilot = Pilot.query.filter_by(id=id).first()
+            operator = Operator.query.filter_by(id=id).first()
         
-        return pilot != None
+        return operator != None
     
     def delete(id: int):
-        pilot = Pilot.query.filter_by(id=id).first()
-        db.session.delete(pilot)
+        operator = Operator.query.filter_by(id=id).first()
+        db.session.delete(operator)
         db.session.commit()
 
     def delete_all():
-        pilots = Pilot.query.all()
-        for pilot in pilots:
-            db.session.delete(pilot)
+        operators = Operator.query.all()
+        for operator in operators:
+            db.session.delete(operator)
         db.session.commit()
 
     def jsonify(self, asDict=False):

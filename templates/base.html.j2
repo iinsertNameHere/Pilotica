@@ -34,16 +34,16 @@
                         <a class="nav-link" href="{{ url_for('webinterface.agentlab')}}">Agentlab</a>
                     </li>
                     <li class="nav-item">
-                    {% if current_pilot.role == 'ADMIN' %}
-                        <a class="nav-link" href="{{ url_for('webinterface.pilots') }}">Pilots</a>
+                    {% if current_operator.role == 'ADMIN' %}
+                        <a class="nav-link" href="{{ url_for('webinterface.operators') }}">Operators</a>
                     {% else %}
-                        <a class="nav-link disabled" href="{{ url_for('webinterface.pilots') }}">Pilots</a>
+                        <a class="nav-link disabled" href="{{ url_for('webinterface.operators') }}">Operators</a>
                     {% endif %}
                     </li>
                     {% endblock %}
                 </ul>
                     <div class="ml-auto"></div>
-                        <span class="nav-text">{{ current_pilot.name }}</span>
+                        <span class="nav-text">{{ current_operator.name }}</span>
                     <a id="logout-btn" class="btn btn-sm btn-outline-danger" type="button" href="{{ url_for('auth.logout') }}" data-toggle="tooltip" data-placement="bottom" title="Logout">
                         <i class="bi bi-box-arrow-right"></i>
                     </a>

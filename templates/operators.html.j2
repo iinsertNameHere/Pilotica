@@ -1,13 +1,13 @@
 {% extends 'base.html.j2' %}
 
-{% block title %}Pilotica - Pilots{% endblock %}
+{% block title %}Pilotica - Operators{% endblock %}
 
 {% block body %}
-    <!-- Pilots Tabel -->
+    <!-- Operators Tabel -->
     <div class="container">
-        {% if pilots %}
-            <h3 class="title-text">Pilots</h3>
-            <table id="pilots_table" class="table table-striped table-dark">
+        {% if operators %}
+            <h3 class="title-text">Operators</h3>
+            <table id="operators_table" class="table table-striped table-dark">
                 <thead>
                     <tr>
                         <th scope="col">#</th>
@@ -17,16 +17,16 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for pilot in pilots %}
+                    {% for operator in operators %}
                         
                             <tr>
-                                <td>{{ pilot["id"] }}</td>
-                                <td>{{ pilot["name"] }}</td>
-                                <td>{{ pilot["role"] }}</td>
+                                <td>{{ operator["id"] }}</td>
+                                <td>{{ operator["name"] }}</td>
+                                <td>{{ operator["role"] }}</td>
                                 <td>
-                                    <button class="btn btn-secondary" onclick="edit_pilot('{{ pilot['id'] }}')" ><i class="bi bi-gear-fill"></i></button>
-                                    {% if pilot['id'] != current_pilot.id %}
-                                        <button class="btn btn-danger" onclick="confirm_delete(delete_pilot, id='{{ pilot['id'] }}')"><i class="bi bi-trash fs-6"></i></button>
+                                    <button class="btn btn-secondary" onclick="edit_operator('{{ operator['id'] }}')" ><i class="bi bi-gear-fill"></i></button>
+                                    {% if operator['id'] != current_operator.id %}
+                                        <button class="btn btn-danger" onclick="confirm_delete(delete_operator, id='{{ operator['id'] }}')"><i class="bi bi-trash fs-6"></i></button>
                                     {% else %}
                                         <button class="btn btn-danger disabled"><i class="bi bi-trash fs-6"></i></button>
                                     {% endif %}
@@ -36,9 +36,9 @@
                 </tbody>
             </table>
         {% else %}
-            <h3 class="title-text">No Pilots in database</h3>
+            <h3 class="title-text">No Operators in database</h3>
         {% endif %}
-        <button type="button" class="btn btn-primary" onclick="add_pilot()" data-dialogTitle="Add Pilot" data-toggle="tooltip" data-placement="bottom" title="Add Pilot"><i class="bi bi-database-fill-add"></i></button>
+        <button type="button" class="btn btn-primary" onclick="add_operator()" data-dialogTitle="Add Operator" data-toggle="tooltip" data-placement="bottom" title="Add Operator"><i class="bi bi-database-fill-add"></i></button>
     </div>
 
     <!-- Edit Modal -->
@@ -52,8 +52,8 @@
                 </button>
             </div>
             <div class="modal-body">
-                <form id="editModal-form" action="{{ url_for('webinterface.edit_pilot') }}" method="POST">
-                    <input form="editModal-form" type="text" style="display: none;" name="id" id="pilot_id" value=1>
+                <form id="editModal-form" action="{{ url_for('webinterface.edit_operator') }}" method="POST">
+                    <input form="editModal-form" type="text" style="display: none;" name="id" id="operator_id" value=1>
                     <div class="form-group">
                         <label for="name" class="col-form-label">Name:</label>
                         <input form="editModal-form" type="text" class="form-control" name="name" id="name" required>
@@ -77,6 +77,6 @@
         </div>
     </div>
 
-    <!-- Pilots JavaScript -->
-    <script>{% include 'js/pilots.js' %}</script>
+    <!-- Operators JavaScript -->
+    <script>{% include 'js/operators.js' %}</script>
 {% endblock %}

@@ -8,7 +8,7 @@ def EnableComponents(_globals: dict, scope_name: str, args: list = list(), retur
 
     *scope_name* The name of the scope function to execute
 
-    *args* A list of variable names that will be forwarding to the Scope function
+    *args* A list of variable names that will be forwarted to the Scope function
 
     *returns* The name of the list that holds all scope returns
 
