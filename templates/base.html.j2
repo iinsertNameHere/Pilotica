@@ -70,6 +70,22 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="textModal" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="textModal-title" style="font-weight: 600;"></h5>
+                        <button type="button" onclick="$('#textModal').modal('hide');" class="btn close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" id="textModal-text"></div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="$('#textModal').modal('hide');">Okay</button>
+                    </div>
+                </div>
+            </div>
+        </div>
         {% endblock %}
 
         {% with messages = get_flashed_messages(with_categories=true) %}

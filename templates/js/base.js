@@ -31,3 +31,11 @@ function confirm_delete(func, id=NaN) {
         $('#deleteModal').modal('hide');
     });
 }
+
+function modal_text(title, text) {
+    $("#textModal-title").html(title);
+    $("#textModal-text").html(text);
+    
+    // Show dialog
+    $('#textModal').modal('show');
+}

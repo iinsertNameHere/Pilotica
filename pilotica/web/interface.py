@@ -1,5 +1,6 @@
 from flask import Blueprint
 from flask import request
+from requests import post
 import json
 import glob
 
@@ -153,8 +154,35 @@ def builder():
 
         return redirect(url_for('webinterface.agentlab'))
 
-@webinterface.route("/<string:agent_uuid>/console")
+@webinterface.route("/<string:agent_uuid>/console", methods={"POST", "GET"})
 @login_required
 def agent_console(agent_uuid):
-    tasks = [task.jsonify(True) for task in Agent.get_by_uuid(agent_uuid).tasks]
-    return render_template("console.html.j2", uuid=agent_uuid, tasks=tasks, current_pilot=current_user)
+    from ..settings import secret_key
+    if request.method == "GET":
+        tasks = [task.jsonify(True) for task in Agent.get_by_uuid(agent_uuid).tasks]
+        return render_template("console.html.j2", uuid=agent_uuid, tasks=tasks, current_pilot=current_user, secret_key=secret_key)
+    else:
+        print("OKAY")
+        command = request.form.get("command")
+        args    = request.form.get("args")
+        victim  = request.form.get("victim")
+        delay   = request.form.get("delay")
+        
+        body = {
+            "uuid": agent_uuid,
+            "task": {  
+                "command": command,
+                "args": args,
+                "victim": victim,
+                "operator": current_user.name,
+                "delay": delay,
+                "execTime": 0,
+                "file": "",
+                "usesmb": "",
+                "actsmb": ""
+            }
+        }
+        resp = Transport(post(url_for("service.task", _external=True), json=body, headers={"key": secret_key}).text, "in")
+        if resp == "FAILED":
+            flash("Could not add new Task!", "danger")
+        return redirect(url_for("webinterface.agent_console", agent_uuid=agent_uuid))

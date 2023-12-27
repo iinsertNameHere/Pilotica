@@ -173,7 +173,8 @@ class Task(db.Model):
             "file": self.file,
             "usesmb": self.usesmb,
             "actsmb": self.actsmb,
-            "fired": self.fired
+            "fired": self.fired,
+            "reply": self.reply
         }
         if not asDict:
             return json.dumps(dict_repr)
