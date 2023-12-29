@@ -150,7 +150,9 @@ def compile_go(go_src: str, output_binary: str, obfuscate=False, target_os='wind
         pre_compile_go(go_src, pre_values)
 
     from .settings import instance_path
+
     command = [os.path.join(instance_path, "go", "bin", compiler), "build", '-o', output_binary]
+    print(command)
     if target_os == 'windows-dll':
         target_os = "windows"
         os.environ["CGO_ENABLED"] = str(1)
