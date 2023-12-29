@@ -138,6 +138,9 @@ def get_values():
 def agentlab():
     from ..settings import instance_path
     path = os.path.join(instance_path, "agentlab", "build")
+    if not os.path.exists(path):
+        os.mkdir(path)
+
     binarys = os.listdir(path)
     enumBin = enumerate(binarys)
     if len(binarys) < 1:

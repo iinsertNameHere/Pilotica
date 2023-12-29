@@ -95,11 +95,17 @@ def download_obfuscator():
     os.environ['GOBIN'] = os.path.join(instance_path, 'go', 'bin')
 
     garble_path = os.path.join(instance_path, 'go', 'bin', 'garble')
-    output = subprocess.check_output([garble_path, 'version']).decode('utf-8')
-    version_number = output.strip().split()[1]
+    try:
+        output = subprocess.check_output([garble_path, 'version']).decode('utf-8')
+        version_number = output.strip().split()[1]
+    except:
+        version_number = "0.0.0"
 
     if version_number != latest:
-        os.remove(garble_path)
+        try:
+            os.remove(garble_path)
+        except:
+            pass
         logger.info("Updating garble...")
         subprocess.run([go_path, "install", "mvdan.cc/garble@latest"])
         logger.success("Finished Uptade!")

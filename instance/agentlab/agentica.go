@@ -113,13 +113,13 @@ func decodeBase64(b64string string) ([]byte, error) {
 }
 
 func main() {
-	uuid := "a8f76dc6-954b-439e-b885-788e15347544"
+	uuid := "@UUID@"
 	hostname, err := os.Hostname()
 	if err != nil {
 		os.Exit(0)
 	}
 
-	baseUrl := "http://127.0.0.1:4444/service"
+	baseUrl := "@URL@"
 
 	postData := BindData{
 		UUID:     uuid,
