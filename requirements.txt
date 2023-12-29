@@ -1,8 +1,9 @@
-Cerberus==1.3.4
-cmake==3.26.3
-Flask==2.2.3
-Flask_Login==0.6.2
-flask_sqlalchemy==3.0.3
-PyYAML==6.0
-Werkzeug==2.2.3
+Cerberus
+cmake
+Flask
+Flask_Login
+flask_sqlalchemy
+PyYAML
+Werkzeug
 tqdm
+requests

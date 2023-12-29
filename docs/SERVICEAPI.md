@@ -1,4 +1,4 @@
-Pilotica Service API
+🖥️ Pilotica Service API
 ====================
 
 The Pilotica Service API can be used to develop custom Agents and User intagererfaces.
@@ -134,15 +134,15 @@ The Pilotica Service API can be used to develop custom Agents and User intagerer
 
 ---
 <details>
-    <summary>:inbox_tray: Get Pilots</summary>
+    <summary>:inbox_tray: Get Operators</summary>
     <blockquote>
     <ul>
     <li><p>method: <code>GET</code></p>
     </li>
-    <li><p>path: <code>service/pilots</code></p>
+    <li><p>path: <code>service/operators</code></p>
     </li>
     </ul>
-    <p>Gets a list of all Pilots in json format</p>
+    <p>Gets a list of all Operators in json format</p>
     </blockquote>
     <blockquote>
     <p><strong>Authorization:</strong> <code>API Key</code></p>
@@ -155,15 +155,15 @@ The Pilotica Service API can be used to develop custom Agents and User intagerer
 </details>
 
 <details>
-    <summary>:x: Delete Pilots</summary>
+    <summary>:x: Delete Operators</summary>
     <blockquote>
     <ul>
     <li><p>method: <code>DELETE</code></p>
     </li>
-    <li><p>path: <code>service/pilots</code></p>
+    <li><p>path: <code>service/operators</code></p>
     </li>
     </ul>
-    <p>Deletes all pilots</p>
+    <p>Deletes all Operators</p>
     </blockquote>
     <blockquote>
     <p><strong>Authorization:</strong> <code>API Key</code></p>
@@ -177,15 +177,15 @@ The Pilotica Service API can be used to develop custom Agents and User intagerer
 
 ---
 <details>
-    <summary>:inbox_tray: Get Pilot</summary>
+    <summary>:inbox_tray: Get Operator</summary>
     <blockquote>
     <ul>
     <li><p>method: <code>GET</code></p>
     </li>
-    <li><p>path: <code>service/pilot?&lt;params&gt;</code></p>
+    <li><p>path: <code>service/operator?&lt;params&gt;</code></p>
     </li>
     </ul>
-    <p>Gets a Pilot by it&#39;s id in json format</p>
+    <p>Gets a Operator by it&#39;s id in json format</p>
     </blockquote>
     <blockquote>
     <p><strong>Authorization:</strong> <code>API Key</code></p>
@@ -205,15 +205,15 @@ The Pilotica Service API can be used to develop custom Agents and User intagerer
 </details>
 
 <details>
-    <summary>:floppy_disk: Update Pilot</summary>
+    <summary>:floppy_disk: Update Operator</summary>
     <blockquote>
     <ul>
     <li><p>method: <code>PUT</code></p>
     </li>
-    <li><p>path: <code>service/pilot?&lt;params&gt;</code></p>
+    <li><p>path: <code>service/operator?&lt;params&gt;</code></p>
     </li>
     </ul>
-    <p>Updates the Pilot with the given id</p>
+    <p>Updates the Operator with the given id</p>
     </blockquote>
     <blockquote>
     <p><strong>Authorization:</strong> <code>API Key</code></p>
@@ -242,15 +242,15 @@ The Pilotica Service API can be used to develop custom Agents and User intagerer
 </details>
 
 <details>
-    <summary>:x: Delete Pilot</summary>
+    <summary>:x: Delete Operator</summary>
     <blockquote>
     <ul>
     <li><p>method: <code>DELETE</code></p>
     </li>
-    <li><p>path: <code>service/pilot?&lt;params&gt;</code></p>
+    <li><p>path: <code>service/operator?&lt;params&gt;</code></p>
     </li>
     </ul>
-    <p>Deletes the pilot with the given id</p>
+    <p>Deletes the Operator with the given id</p>
     </blockquote>
     <blockquote>
     <p><strong>Authorization:</strong> <code>API Key</code></p>

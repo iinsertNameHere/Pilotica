@@ -1,6 +1,6 @@
-// Function to delete a pilot from the DB
-function delete_pilot(id) {
-    fetch("{{ url_for('service.pilot') }}?id="+id, {method: 'DELETE'})
+// Function to delete a Operator from the DB
+function delete_operator(id) {
+    fetch("{{ url_for('service.operator') }}?id="+id, {method: 'DELETE'})
     .then(response => response.text())
     .then(data => new Transport(data).load())
     .then(result => {
@@ -8,7 +8,7 @@ function delete_pilot(id) {
             alert("Failed!")
             return
         }
-        window.location.href = "{{ url_for('webinterface.pilots') }}"
+        window.location.href = "{{ url_for('webinterface.operators') }}"
     });
 }
 
@@ -16,7 +16,7 @@ function submit_editModal_form() {
     $('#editModal-form').submit()
 }
 
-const addPilot_pwdHtml = '\
+const addOperator_pwdHtml = '\
 <div class="form-group"> \
     <label for="password1" class="col-form-label">Password:</label> \
     <input type="text" form="editModal-form" class="form-control" name="password1" id="password1" required></input> \
@@ -26,7 +26,7 @@ const addPilot_pwdHtml = '\
     <input type="text" form="editModal-form" class="form-control" name="password2" id="password2" required></input> \
 </div>'
 
-const editPilot_pwdHtml = " \
+const editOperator_pwdHtml = " \
 <input type='checkbox' onclick='handle_check()' class='form-check-input' name='changePwd' id='changePwd' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'> \
 <label for='changePwd' class='form-check-label'>New Password</label> \
 <div id='form-pwds' style='display: none; margin-bottom: 10px'> \
@@ -51,24 +51,24 @@ function handle_check()
   }
 }
 
-function add_pilot() {
+function add_operator() {
     var modal = $('#editModal')
 
-    modal.find('.modal-title').text("New Pilot")
-    document.getElementById('editModal-form').action = "{{ url_for('webinterface.new_pilot') }}"
+    modal.find('.modal-title').text("New Operator")
+    document.getElementById('editModal-form').action = "{{ url_for('webinterface.new_operator') }}"
 
-    $('#pwd-group').html(addPilot_pwdHtml)
+    $('#pwd-group').html(addOperator_pwdHtml)
     $('#editModal').modal('show')
 }
 
-function edit_pilot(id) {
+function edit_operator(id) {
     var modal = $('#editModal')
 
-    modal.find('.modal-title').text("Editing Pilot "+id)
-    document.getElementById('editModal-form').action = "{{ url_for('webinterface.edit_pilot') }}"
-    $('#pwd-group').html(editPilot_pwdHtml)
+    modal.find('.modal-title').text("Editing Operator "+id)
+    document.getElementById('editModal-form').action = "{{ url_for('webinterface.edit_operator') }}"
+    $('#pwd-group').html(editOperator_pwdHtml)
     
-    fetch("{{ url_for('service.pilot') }}?id="+id, {method: 'GET'})
+    fetch("{{ url_for('service.operator') }}?id="+id, {method: 'GET'})
     .then(response => response.text())
     .then(data => new Transport(data).load())
     .then(result => {
@@ -77,10 +77,10 @@ function edit_pilot(id) {
             return
         }
         jdata = JSON.parse(result)
-        document.getElementById('pilot_id').value = parseInt(id)
+        document.getElementById('operator_id').value = parseInt(id)
         document.getElementById('name').value = jdata['name']
         document.getElementById('role').value = jdata['role']
-        if ('{{ current_pilot.id }}' == id) {
+        if ('{{ current_operator.id }}' == id) {
             document.getElementById('role').disabled = "true"
         }
     })

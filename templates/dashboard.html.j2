@@ -1,0 +1,78 @@
+{% extends 'base.html.j2' %}
+
+{% block title %}Pilotica - Dashboard{% endblock %}
+
+{% block body %}
+    <div class="container-fluid" style="margin-top: 50px;">
+        <div class="header-body">
+          <div class="row justify-content-center">
+            <div class="col-xl-3 col-lg-6">
+              <div class="card card-stats mb-4 mb-xl-0" style="background-color: #141414;">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col">
+                      <h5 class="card-title text-uppercase text-muted mb-0">Total Agents</h5>
+                      <span class="h2 font-weight-bold mb-0">{{ agent_count }}</span>
+                    </div>
+                  </div>
+                  <p class="mt-3 mb-0 text-muted text-sm">
+                    <span class="text-success mr-2">{{ online_average }}%</span>
+                    <span class="text-nowrap">Online at the moment</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-3 col-lg-6">
+              <div class="card card-stats mb-4 mb-xl-0" style="background-color: #141414;">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col">
+                      <h5 class="card-title text-uppercase text-muted mb-0">Total Tasks</h5>
+                      <span class="h2 font-weight-bold mb-0">{{ task_count }}</span>
+                    </div>
+                  </div>
+                  <p class="mt-3 mb-0 text-muted text-sm">
+                    <span class="text-success mr-2">{{ finished_average }}%</span>
+                    <span class="text-nowrap">Finished Execution</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-3 col-lg-6">
+              <div class="card card-stats mb-4 mb-xl-0" style="background-color: #141414;">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col">
+                      <h5 class="card-title text-uppercase text-muted mb-0">Tasks by you</h5>
+                      <span class="h2 font-weight-bold mb-0">{{ mytask_count }}</span>
+                    </div>
+                  </div>
+                  <p class="mt-3 mb-0 text-muted text-sm">
+                    <span class="text-success mr-2">{{ myfinished_average }}%</span>
+                    <span class="text-nowrap">Finished Execution</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="col-xl-3 col-lg-6">
+              <div class="card card-stats mb-4 mb-xl-0" style="background-color: #141414;">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col">
+                      <h5 class="card-title text-uppercase text-muted mb-0">Operators</h5>
+                      <span class="h2 font-weight-bold mb-0">{{ operator_count }}</span>
+                    </div>
+                  </div>
+                  <p class="mt-3 mb-0 text-muted text-sm">
+                    <span style="color: #141414;" class="text-nowrap">_</span>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row justify-content-center">
+              <img src="/static/logo.svg" class="col-xl-3 col-lg-6" style="width: 40em; margin-top: 10em">
+          </div>
+        </div>
+      </div>
+{% endblock %}

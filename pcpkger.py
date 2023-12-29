@@ -47,7 +47,7 @@ if __name__ == "__main__":
     logger.custom(start_msg, {Color.Bright.Magenta}, True, str())
 
     if args.auto:
-        path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'component-src')
+        path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'pkgsrc')
         if args.output == None:
             dst_folder = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'instance/components')
         else:
