@@ -175,10 +175,10 @@ def compile_go(go_src: str, output_binary: str, obfuscate=False, target_os='wind
         subprocess.check_call(command)
     except subprocess.CalledProcessError:
         reset()
-        logger.custom("Failed to Compiled '"+go_src+"' to '"+output_binary+"'", Color.Bright.Red, False, "::")
+        logger.custom("Failed to Compiled '"+go_src+"' to '"+output_binary+"'\n", Color.Bright.Red, False, "::")
         return False
 
     reset()
 
-    logger.custom("Compiled '"+go_src+"' to '"+output_binary+"'", Color.Bright.Green, False, "::")
+    logger.custom("Compiled '"+go_src+"' to '"+output_binary+"'\n", Color.Bright.Green, False, "::")
     return True
