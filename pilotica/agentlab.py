@@ -157,6 +157,8 @@ def compile_go(go_src: str, output_binary: str, obfuscate=False, target_os='wind
 
     from .settings import instance_path
 
+    print(instance_path + "\\agentlab")
+    os.chdir(instance_path + "\\agentlab")
     command = [os.path.join(instance_path, "go", "bin", compiler), "build", '-o', output_binary]
     if target_os == 'windows-dll':
         target_os = "windows"

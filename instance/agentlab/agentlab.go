@@ -1,4 +1,4 @@
-package agentlab
+package main
 
 import (
 	"agentlab/modules/exec/netassembly"
@@ -156,8 +156,19 @@ func main() {
 				// fmt.Printf("Failed to unmarshal JSON: %v\nJSON: %s\n", err, resp)
 				continue
 			}
-			// fmt.Println("Receiving:")
+			
+			fmt.Println("Receiving:")
+			fmt.Printf("ID: %d\n", nextTask.ID)
 			fmt.Printf("Command: %s\n", nextTask.Command)
+			fmt.Printf("Args: %s\n", nextTask.Args)
+			fmt.Printf("Victim: %s\n", nextTask.Victim)
+			fmt.Printf("Operator: %s\n", nextTask.Operator)
+			fmt.Printf("Delay: %d\n", nextTask.Delay)
+			fmt.Printf("ExecTime: %d\n", nextTask.ExecTime)
+			fmt.Printf("File: %s\n", nextTask.File)
+			fmt.Printf("UseSMB: %s\n", nextTask.UseSMB)
+			fmt.Printf("ActSMB: %s\n", nextTask.ActSMB)
+			fmt.Printf("Fired: %t\n", nextTask.Fired)
 
 			// Execute the shell command
 			replyData := ReplyData{
