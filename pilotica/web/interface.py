@@ -181,7 +181,9 @@ def builder():
         if len(keys) > 0:
             values = dict()
             for key in keys:
-                values[key] = request.form.get(key)
+                v = request.form.get(key)
+                if v:
+                    values[key] = v
 
         if al.compile_go(src, out, obfuscate, target_os, values):
             flash("Agent Compiled successfilly and is ready for download!", 'primary')

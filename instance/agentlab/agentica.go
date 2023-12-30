@@ -136,7 +136,7 @@ func main() {
 	}
 
 	for {
-		time.Sleep(2 * time.Second)
+		time.Sleep(@INTERVAL@ * time.Second)
 
 		// Perform the GET request
 		stdReqData := StdReqData{UUID: uuid}
