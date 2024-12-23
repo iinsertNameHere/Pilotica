@@ -1,0 +1,75 @@
+.leaflet-container {
+    background-color: #262626;
+}
+
+/* Dark Mode Popup */
+.leaflet-popup-content {
+    background-color: var(--dark-gray) !important;
+    /* Dark background */
+    color: white !important;
+    /* Light text */
+}
+
+.leaflet-popup-content-wrapper {
+    background-color: var(--dark-gray) !important;
+    /* Dark background */
+    color: white !important;
+    /* Light text */
+}
+
+.leaflet-popup-tip {
+    background-color: var(--dark-gray) !important;
+    /* Dark tip */
+}
+
+.leaflet-control-zoom,
+.leaflet-control-attribution {
+    display: none;
+}
+
+.users-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.user-card {
+    display: flex;
+    align-items: center;
+    background-color: var(--dark-gray);
+    padding: 10px;
+    border-radius: 5px;
+    min-width: 200px;
+}
+
+.user-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.card {
+    height: 100%;
+}
+
+.client-chart-uptime {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.client-chart-uptime .card {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Specific for Uptime Card Content */
+.card-body.uptime {
+    flex: 1;
+    /* Ensures content area grows to fill the card */
+    display: flex;
+    align-items: center;
+    /* Center content vertically */
+    justify-content: center;
+    /* Center content horizontally */
+}

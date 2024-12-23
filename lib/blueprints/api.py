@@ -14,6 +14,6 @@ async def userpng(request: Request, id: id):
         user = db.query(User).filter(User.id == id).first()
 
     if not user:
-        empty(status=404)
+        return empty(status=404)
 
     return raw(user.image, content_type="image/png")

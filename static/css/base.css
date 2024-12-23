@@ -26,6 +26,23 @@ body {
     color: var(--white);
 }
 
+.top-bar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 999;
+    background-color: white;  /* Ensure the background is solid */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional shadow for visual effect */
+  }
+  
+  body {
+    padding-top: 60px;  /* Adjust based on the height of your top bar */
+  }
+  
+  .container-fluid {
+    padding-top: 0;  /* Remove any additional padding */
+  }
+
 .burger-menu {
     cursor: pointer;
     width: 30px;
@@ -54,19 +71,19 @@ body {
 }
 
 .nav-menu.left {
-    position: absolute;
+    position: fixed;
     left: 0px;
     border-bottom-right-radius: 8px;
 }
 
 .nav-menu.right {
-    position: absolute;
+    position: fixed;
     right: 0px;
     border-bottom-left-radius: 8px;
 }
 
 .nav-menu {
-    position: absolute;
+    position: fixed;
     top: 60px;
     width: 200px;
     z-index: 1000;

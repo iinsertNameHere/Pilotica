@@ -1,5 +1,137 @@
 {% extends "base.html.j2" %}
 {% block title %}Dashboard{% endblock title %}
+{% block head %}
+<link rel="stylesheet" href="/static/css/dashbaord.css">
+{% endblock head %}
 {% block content %}
-<h1>Dashboard</h1>
+<div class="container mt-4">
+
+    <!-- Worldmap Graph Card -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header text-white" style="background-color: var(--green);">
+                    Client Geolocations
+                </div>
+                <div class="card-body">
+                    <div id="worldmapGraph" style="height: 400px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4 client-chart-uptime">
+        <!-- New Clients Graph Card -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header text-white" style="background-color: var(--blue);">
+                    New Clients (Last 24 Hours)
+                </div>
+                <div class="card-body">
+                    <canvas id="newClientsGraph"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Server Uptime -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header text-white" style="background-color: var(--blue);">
+                    Server Uptime
+                </div>
+                <div class="card-body uptime text-center">
+                    <h1 style="font-size: 55px; margin: 0;">{{ uptime }}</h1>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logged In Users Card -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header text-white" style="background-color: var(--light-orange);">
+                    Logged In Users
+                </div>
+                <div class="card-body">
+                    <div class="users-container">
+                        {% for u in users %}
+                            <div class="user-card">
+                                <img src="/api/users/{{ u.id }}/image.png" alt="User Image" class="user-image">
+                                {% if u.name == user.name %}
+                                    <span style="color: #ffffff92;">Me</span>
+                                {% else %}
+                                    <span>{{ u.name }}</span>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock content %}
+{% block scripts %}
+<script>
+     // Initialize Leaflet map for worldmap graph with zoom restrictions
+    const map = L.map('worldmapGraph', {
+        maxBounds: [
+            [-90, -180], // Southwest corner
+            [90, 180]    // Northeast corner
+        ],
+        maxBoundsViscosity: 1.0, // Prevents dragging beyond boundaries
+        zoomControl: false, // Disable default zoom controls if desired
+    }).setView([30, 0], 2); // Center map at (20, 0) with zoom level 2
+
+    // Restrict zoom levels to only fit the world view
+    map.options.minZoom = 2; // Set minimum zoom level
+    map.options.maxZoom = 15; // Set maximum zoom level
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 19 // Default max zoom for tile layer
+    }).addTo(map);
+
+    // Example IP geolocation data (latitude, longitude, count, name)
+    const ipLocations = {{ ipLocations }};
+
+    // Function to calculate marker size based on count
+    function getMarkerSize(count) {
+        return 1 + Math.floor(count * 0.2); // 0.2px per IP
+    }
+
+    // Add markers to the map based on location data
+    ipLocations.forEach(location => {
+        const [name, lat, lng, count, ips] = location;
+        const size = getMarkerSize(count);
+
+        const marker = L.circleMarker([lat, lng], {
+            color: 'orange',
+            radius: size,
+            fillOpacity: 0.5,
+        }).addTo(map);
+
+        // Bind a popup with location name and count
+        marker.bindPopup(`<strong>${name}</strong><br>Count: ${count}`);
+    });
+
+    // Initialize Chart.js for new clients graph
+    const ctxNewClients = document.getElementById('newClientsGraph').getContext('2d');
+    new Chart(ctxNewClients, {
+        type: 'line', // Change chart type to line
+        data: {
+            labels: ['24h', '23h', '22h', '21h', '20h', '19h', '18h', '17h', '16h', '15h', '14h', '13h', '12h', '11h', '10h', '9h', '8h', '7h', '6h', '5h', '4h', '3h', '2h', '1h'], // Example data
+            datasets: [{
+                label: 'New Clients',
+                data: {{ newClientClounts }},
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1,
+                tension: 0.1
+            }]
+        }
+    });
+</script>
+{% endblock scripts %}

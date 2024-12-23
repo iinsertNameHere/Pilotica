@@ -9,13 +9,18 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css">
   <link rel="stylesheet" href="/static/css/base.css">
+  {% block head %}
+  {% endblock head %}
 </head>
-<body style="max-hight: clac(100vh - 100px); overflow: hidden">
+<body style="max-hight: clac(100vh - 100px);">
   <div class="container-fluid">
     {% if user %}
     <!-- Top Bar -->
-    <div class="row py-2 align-items-center top-bar"">
+    <div class="row py-2 align-items-center top-bar">
       <div class="col-3 d-flex align-items-center">
         <!-- Burger Menu -->
         <div class="burger-menu" id="burgerBtn">
