@@ -182,3 +182,22 @@ body {
     box-shadow: none;
     color: var(--white);
 }
+
+.alert-danger {
+    position: fixed;
+    top: 60px;
+    width: 600px;
+    z-index: 10000;
+    left: calc(50% - 300px) ;
+    text-align: center;
+    padding: 4px;
+    cursor: pointer;
+    --bs-alert-color: var(--red);
+    --bs-alert-bg: #00000056;
+    --bs-alert-border-color: var(--red);
+    --bs-alert-link-color: var(--bs-danger-text);
+}
+
+.btn-close {
+    display: none;
+}

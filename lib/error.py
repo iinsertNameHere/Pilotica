@@ -1,7 +1,7 @@
 from sanic import Sanic, Request, response
 from urllib.parse import urlencode
 
-def error_redirect(request: Request, msg: str, route: str = None):
+def error_redirect(request: Request, msg: str, route: str = "/auth/login"):
     """
     A function to handle errors by redirecting the user either to a 
     specified route or to the current route with an error message as a query parameter.
