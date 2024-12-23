@@ -1,7 +1,0 @@
-name: "Base64 Transport"
-alias: "base64-transport"
-creator: "pilotica"
-version: '1.0.0'
-description: "A Component-Package that that base64 encodes/decodes all api trafic" 
-scopes:
-  - transport
