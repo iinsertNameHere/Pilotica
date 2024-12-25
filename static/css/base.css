@@ -154,6 +154,40 @@ body {
     --bs-gradient: none;
 }
 
+.btn-outline-orange {
+    --bs-btn-color: var(--light-orange);
+    --bs-btn-border-color: var(--light-orange);
+    --bs-btn-hover-color: var(--white);
+    --bs-btn-hover-bg: var(--light-orange);
+    --bs-btn-hover-border-color: var(--light-orange);
+    --bs-btn-focus-shadow-rgb: 220, 53, 69;
+    --bs-btn-active-color: var(--white);
+    --bs-btn-active-bg: var(--light-orange);
+    --bs-btn-active-border-color: var(--light-orange);
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    --bs-btn-disabled-color: var(--light-orange);
+    --bs-btn-disabled-bg: transparent;
+    --bs-btn-disabled-border-color: var(--light-orange);
+    --bs-gradient: none;
+}
+
+.btn-outline-gray {
+    --bs-btn-color: var(--outline);
+    --bs-btn-border-color: var(--outline);
+    --bs-btn-hover-color: var(--white);
+    --bs-btn-hover-bg: var(--outline);
+    --bs-btn-hover-border-color: var(--outline);
+    --bs-btn-focus-shadow-rgb: 220, 53, 69;
+    --bs-btn-active-color: var(--white);
+    --bs-btn-active-bg: var(--outline);
+    --bs-btn-active-border-color: var(--outline);
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    --bs-btn-disabled-color: var(--outline);
+    --bs-btn-disabled-bg: transparent;
+    --bs-btn-disabled-border-color: var(--outline);
+    --bs-gradient: none;
+}
+
 .noselect {
     -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
@@ -167,7 +201,7 @@ body {
     background-color: var(--gray);
 }
 
-.form-control {
+.form-control, .form-select {
     background-color: var(--dark-gray);
     border-color: #00000000;
     border-width: 2px;
@@ -175,12 +209,25 @@ body {
     color: var(--white);
 }
 
-.form-control:focus {
+.form-control:focus, .form-select:focus {
     background-color: var(--dark-gray);
-    border-color: #4b4b4bd6;
+    border-color: var(--outline);
     border-width: 2px;
     box-shadow: none;
     color: var(--white);
+}
+
+.table {
+    --bs-table-color: var(--white);
+    --bs-table-bg: transparent;
+    --bs-table-border-color: var(--outline);
+    --bs-table-accent-bg: transparent;
+    --bs-table-striped-color: var(--white);
+    width: 100%;
+    margin-bottom: 1rem;
+    color: var(--bs-table-color);
+    vertical-align: top;
+    border-color: var(--bs-table-border-color);
 }
 
 .alert-danger {

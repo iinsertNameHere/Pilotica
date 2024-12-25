@@ -120,7 +120,7 @@
     // Initialize Chart.js for new clients graph
     const ctxNewClients = document.getElementById('newClientsGraph').getContext('2d');
     new Chart(ctxNewClients, {
-        type: 'line', // Change chart type to line
+        type: 'bar', // Change chart type to line
         data: {
             labels: ['24h', '23h', '22h', '21h', '20h', '19h', '18h', '17h', '16h', '15h', '14h', '13h', '12h', '11h', '10h', '9h', '8h', '7h', '6h', '5h', '4h', '3h', '2h', '1h'], // Example data
             datasets: [{
@@ -130,7 +130,30 @@
                 borderColor: 'rgba(75, 192, 192, 1)',
                 borderWidth: 1,
                 tension: 0.1
-            }]
+            }],
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Hours Ago'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'New Clients'
+                    },
+                    beginAtZero: true
+                }
+            }
         }
     });
 </script>

@@ -37,6 +37,8 @@ geolocation_example_data = """[
     ['Shanghai, CN', '31.2222', '121.4581', 1, ['58.192.0.1']]
 ]"""
 
+ncc = "[0, 1, 2, 1, 3, 1, 2, 3, 4, 4, 3, 2, 0, 0, 1]"
+
 def get_uptime():
     start_time_str = os.environ.get("PILOTICA_START_TIME")
     if not start_time_str: return "0s"
@@ -58,15 +60,37 @@ async def dashboard(request: Request):
     user = get_authenticated_user(request)
     return await render("dashboard.html.j2", context={
         "active": "dashboard", "user": user.to_json(), "premissions": Premissions.to_json(),
-        "ipLocations": geolocation_example_data, "uptime": get_uptime(), "newClientClounts": "[1, 0, 3]",
+        "ipLocations": geolocation_example_data, "uptime": get_uptime(), "newClientClounts": ncc,
         "users": [{"id": 1, "name": "admin"}, {"id": 1, "name": "fluffyman1"}, {"id": 1, "name": "simbamba"}, {"id": 1, "name": "rucky1510"}]})
+
+test_clients = [
+    {"id": 1, "time": "2024-12-23 14:02:10", "ip": "192.168.1.12", "mac": "00:1A:2B:3C:4D:60", "online": False, "checked": False},
+    {"id": 2, "time": "2024-12-23 14:02:10", "ip": "192.168.1.12", "mac": "00:1A:2B:3C:4D:60", "online": True, "checked": True},
+    {"id": 3, "time": "2024-12-23 14:02:10", "ip": "192.168.1.12", "mac": "00:1A:2B:3C:4D:60", "online": False, "checked": True},
+    {"id": 4, "time": "2024-12-23 14:02:10", "ip": "192.168.1.12", "mac": "00:1A:2B:3C:4D:60", "online": False, "checked": False},
+    {"id": 5, "time": "2024-12-23 14:02:10", "ip": "192.168.1.12", "mac": "00:1A:2B:3C:4D:60", "online": True, "checked": False},
+    {"id": 6, "time": "2024-12-23 14:02:10", "ip": "192.168.1.12", "mac": "00:1A:2B:3C:4D:60", "online": True, "checked": True},
+    {"id": 7, "time": "2024-12-23 14:02:10", "ip": "192.168.1.12", "mac": "00:1A:2B:3C:4D:60", "online": True, "checked": False},
+    {"id": 8, "time": "2024-12-23 14:02:10", "ip": "192.168.1.12", "mac": "00:1A:2B:3C:4D:60", "online": False, "checked": False}
+]
+
+def get_online():
+    out = 0
+    for c in test_clients:
+        if c["online"]: out += 1
+
+    return out
+
+
 
 @ui_bp.get("/clients")
 async def clients(request: Request):
     error = authenticated(request)
     if error: return error
     user = get_authenticated_user(request)
-    return await render("clients.html.j2", context={"active": "clients", "user": user.to_json(), "premissions": Premissions.to_json()})
+    return await render("clients.html.j2", context={
+        "active": "clients", "user": user.to_json(), "premissions": Premissions.to_json(),
+        "clients": test_clients, "onlineClients": get_online(), "totalClients": len(test_clients), "clientGroth24h": "[5, 15, 30, 50, 80, 100, 120, 125]"})
 
 @ui_bp.get("/settings")
 async def settings(request: Request):

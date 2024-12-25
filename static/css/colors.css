@@ -12,7 +12,7 @@
 
     --bg: var(--dark-gray);
     --light-bg: var(--gray);
-    --outline: var(--light-gray); 
+    --outline: #4b4b4bd6; 
 
     --danger: var(--red);
     --warning: var(--yellow);
