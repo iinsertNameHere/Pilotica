@@ -1,9 +1,0 @@
-# Component-Package Metadata
-name: "Service Testing"
-alias: "service-testing"
-creator: "pilotica" 
-version: '1.0.0'   
-description: "Component-Package to test the service module"
-scopes:
-  # service Scope
-  - service

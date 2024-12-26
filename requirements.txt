@@ -1,9 +1,7 @@
-Cerberus
-cmake
-Flask
-Flask_Login
-flask_sqlalchemy
-PyYAML
-Werkzeug
-tqdm
-requests
+sanic
+sanic-ext
+jinja2
+bcrypt
+sqlalchemy
+PyJWT
+pillow

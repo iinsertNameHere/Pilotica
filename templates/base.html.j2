@@ -1,116 +1,121 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <!-- favicon.ico --> 
-        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-
-        <!-- Title Block -->
-        <title>{% block title %}{% endblock %}</title>
-
-        <!-- Bootstrap CSS -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.2/css/bootstrap.min.css"/>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.4/font/bootstrap-icons.css" rel="stylesheet">
-        
-        <!-- Google Font -->
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat&display=swap">
-        
-        <!-- Base CSS -->
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
-    </head>
-    <body class=" bg-dark text-white">
-        {% block static %}
-            <!-- Navigation Bar -->
-            <nav class="navbar navbar-expand-lg navbar-dark">
-                <div class="container-fluid">
-                    <a class="navbar-logo" style="margin-right: 20px;">
-                    <img src="{{ url_for('static', filename='logo.svg') }}" alt="Pilotica Logo" width="125px">
-                </a>
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    {% block nav_items %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('webinterface.dashboard') }}">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('webinterface.agents') }}">Agents</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('webinterface.agentlab')}}">Agentlab</a>
-                    </li>
-                    <li class="nav-item">
-                    {% if current_operator.role == 'ADMIN' %}
-                        <a class="nav-link" href="{{ url_for('webinterface.operators') }}">Operators</a>
-                    {% else %}
-                        <a class="nav-link disabled" href="{{ url_for('webinterface.operators') }}">Operators</a>
-                    {% endif %}
-                    </li>
-                    {% endblock %}
-                </ul>
-                    <div class="ml-auto"></div>
-                        <span class="nav-text">{{ current_operator.name }}</span>
-                    <a id="logout-btn" class="btn btn-sm btn-outline-danger" type="button" href="{{ url_for('auth.logout') }}" data-toggle="tooltip" data-placement="bottom" title="Logout">
-                        <i class="bi bi-box-arrow-right"></i>
-                    </a>
-                </div>
-            </nav>
-
-            <!-- Modal for Confirmation Dialog -->
-            <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" style="font-weight: 600;">Confirm Delete</h5>
-                        <button type="button" onclick="$('#deleteModal').modal('hide');" class="btn close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body" id="deleteModal-text">
-                        Are you sure you want to continue the deletion process?
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="$('#deleteModal').modal('hide');">Cancel</button>
-                        <button type="button" class="btn btn-danger" id="deleteButton">Delete</button>
-                    </div>
-                </div>
-            </div>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pilotica - {% block title %}{% endblock title %}</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css">
+  <link rel="stylesheet" href="/static/css/base.css">
+  {% block head %}
+  {% endblock head %}
+</head>
+<body style="max-height: calc(100vh - 100px);">
+  <div class="container-fluid">
+    {% if user %}
+    <!-- Top Bar -->
+    <div class="row py-2 align-items-center top-bar">
+      <div class="col-3 d-flex align-items-center">
+        <!-- Burger Menu -->
+        <div class="burger-menu" id="burgerBtn">
+          <div class="burger-line"></div>
+          <div class="burger-line"></div>
+          <div class="burger-line"></div>
         </div>
-        <div class="modal fade" id="textModal" tabindex="-1" role="dialog" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="textModal-title" style="font-weight: 600;"></h5>
-                        <button type="button" onclick="$('#textModal').modal('hide');" class="btn close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body" id="textModal-text"></div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="$('#textModal').modal('hide');">Okay</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endblock %}
+      </div>
+      <div class="col-6 text-center">
+        <!-- Logo Image -->
+        <img src="/static/logo.svg" alt="Logo" class="noselect logo">
+      </div>
+      <div class="col-3 text-end noselect" style="cursor: pointer;" id="profileBtn">
+        <span class="me-2 d-inline" style="font-size: 18px;">{{ user.name }}</span>
+        <img width="40px" src="/api/users/{{ user.id }}/image.png" alt="Profile" class="rounded-circle">
+      </div>
+    </div>
 
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                <!-- Alerts -->
-                {% for category, message in messages %}
-                    <div id="alert-{{ loop.index }}"class="alert alert-{{ category }} alert-dismissible fade show mb-3" role="alert">
-                        {{ message }}
-                        <button onclick="document.getElementById('alert-{{ loop.index }}').remove()" type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
+    <!-- Dropdown Navigation Menu -->
+    <div class="row nav-menu left" id="navMenu">
+      <nav class="col">
+        <ul class="nav flex-column nav-pills p-2">
+          <li class="nav-item">
+            <a class="nav-link noselect text-white {% if active == 'dashboard' %}active{% endif %}" href="/dashboard">Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link noselect text-white {% if active == 'clients' %}active{% endif %}" href="/clients">Clients</a>
+          </li>
+          {% if premissions["Configurator"] in user.premissions or premissions["Admin"] in user.premissions %}
+          <li class="nav-item">
+            <a class="nav-link noselect text-white {% if active == 'settings' %}active{% endif %}" href="/settings">Settings</a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
 
-        <!-- jQuery library -->
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Dropdown Navigation Menu -->
+    <div class="row nav-menu right" id="profileMenu">
+      <nav class="col">
+        <ul class="nav flex-column nav-pills p-2">
+          <li class="nav-item">
+            <a class="nav-link noselect" style="color: var(--danger);" href="/auth/logout">Logout</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+    {% endif %}
 
-        <!-- Bootstrap JavaScript -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.2/js/bootstrap.min.js"></script>
+    <!-- Error Alert Section -->
+    {% if request.args.get('error') %}
+    <div class="alert alert-danger alert-dismissible fade show" data-bs-dismiss="alert" role="alert">
+      {{ request.args.get('error') }}
+    </div>
+    {% endif %}
 
-        {% block body %}
-        {% endblock %}
+    <!-- Content Area -->
+    <div class="row mt-3">
+      <main class="col">
+        {% block content %}
+        {% endblock content %}
+      </main>
+    </div>
+  </div>
 
-        <!-- Base JavaScript -->
-        <script>{% include 'js/base.js' %}</script>
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    {% if user %}
+    const burgerBtn = document.getElementById('burgerBtn');
+    const navMenu = document.getElementById('navMenu');
+
+    burgerBtn.addEventListener('click', function () {
+      this.classList.toggle('open');
+      if (navMenu.style.height === '0px' || !navMenu.style.height) {
+        navMenu.style.height = navMenu.scrollHeight + 'px';
+      } else {
+        navMenu.style.height = '0px';
+      }
+    });
+
+    const profileBtn = document.getElementById('profileBtn');
+    const profileMenu = document.getElementById('profileMenu');
+
+    profileBtn.addEventListener('click', function () {
+      this.classList.toggle('open');
+      if (profileMenu.style.height === '0px' || !profileMenu.style.height) {
+        profileMenu.style.height = profileMenu.scrollHeight + 'px';
+      } else {
+        profileMenu.style.height = '0px';
+      }
+    });
+    {% endif %}
+  </script>
+  {% block scripts %}
+  {% endblock scripts %}
+</body>
+</html>

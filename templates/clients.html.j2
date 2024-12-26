@@ -1,0 +1,148 @@
+{% extends "base.html.j2" %}
+{% block title %}Clients{% endblock title %}
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Online and Total Client Counts -->
+        <div class="col-md-2" style="max-height: 370px; width: 50%;">
+            <div class="d-flex flex-column h-100">
+                <div class="card text-center mb-3 flex-fill">
+                    <div class="card-header text-white" style="background-color: var(--green);">
+                        Online Client Count
+                    </div>
+                    <div class="card-body d-flex">
+                        <p class="card-text display-4 my-auto mx-auto">{{ onlineClients }}</p>
+                    </div>
+                </div>
+                <div class="card text-center flex-fill">
+                    <div class="card-header text-white" style="background-color: var(--green);">
+                        Total Client Count
+                    </div>
+                    <div class="card-body d-flex">
+                        <p class="card-text display-4 my-auto mx-auto">{{ totalClients }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Client Growth Last 24h -->
+        <div class="col-md-2" style="max-height: 370px; width: 50%;">
+            <div class="card h-100">
+                <div class="card-header text-white" style="background-color: var(--blue);">
+                    Client Growth (Last 24h)
+                </div>
+                <div class="card-body">
+                    <canvas id="growthChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Card -->
+    <div class="card mt-4">
+        <div class="card-header text-white" style="background-color: var(--light-orange);">
+            Clients
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <!-- Filter Dropdown -->
+                <div class="col-md-3">
+                    <select class="form-select">
+                        <option selected>All</option>
+                        <option value="online">Online</option>
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="checked">Checked</option>
+                        <option value="not_checked">Not Checked</option>
+                    </select>
+                </div>
+
+                <!-- Search Bar and Button -->
+                <div class="col-md-7">
+                    <input type="text" class="form-control" placeholder="Search clients...">
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-outline-orange w-100">Search</button>
+                </div>
+            </div>
+
+            <!-- Client Table -->
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Date/Time</th>
+                        <th>IP</th>
+                        <th>MAC</th>
+                        <th>Online Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for client in clients %}
+                        <tr>
+                        <td>{{ client.id }}</td>
+                        <td>{{ client.time }}</td>
+                        <td>{{ client.ip }}</td>
+                        <td>{{ client.mac }}</td>
+                        {% if client.online %}
+                            <td><svg xmlns="http://www.w3.org/2000/svg" fill="var(--green)" x="0px" y="0px" width="20" height="20" viewBox="0 0 50 50">
+<path d="M 41.9375 8.625 C 41.273438 8.648438 40.664063 9 40.3125 9.5625 L 21.5 38.34375 L 9.3125 27.8125 C 8.789063 27.269531 8.003906 27.066406 7.28125 27.292969 C 6.5625 27.515625 6.027344 28.125 5.902344 28.867188 C 5.777344 29.613281 6.078125 30.363281 6.6875 30.8125 L 20.625 42.875 C 21.0625 43.246094 21.640625 43.410156 22.207031 43.328125 C 22.777344 43.242188 23.28125 42.917969 23.59375 42.4375 L 43.6875 11.75 C 44.117188 11.121094 44.152344 10.308594 43.78125 9.644531 C 43.410156 8.984375 42.695313 8.589844 41.9375 8.625 Z"></path>
+</svg></td>
+                        {% else %}
+                            <td><svg xmlns="http://www.w3.org/2000/svg" fill="var(--red)" x="0px" y="0px" width="20" height="20" viewBox="0 0 50 50">
+<path d="M 9.15625 6.3125 L 6.3125 9.15625 L 22.15625 25 L 6.21875 40.96875 L 9.03125 43.78125 L 25 27.84375 L 40.9375 43.78125 L 43.78125 40.9375 L 27.84375 25 L 43.6875 9.15625 L 40.84375 6.3125 L 25 22.15625 Z"></path>
+</svg></td>
+                        {% endif %}
+                        <td><a href="/client/{{ client.id }}"><svg xmlns="http://www.w3.org/2000/svg" {% if client.checked %}fill="var(--blue)"{% else %}fill="var(--white)"{% endif %} x="0px" y="0px" width="20" height="20" viewBox="0 0 48 48">
+<path d="M 40.960938 4.9804688 A 2.0002 2.0002 0 0 0 40.740234 5 L 28 5 A 2.0002 2.0002 0 1 0 28 9 L 36.171875 9 L 22.585938 22.585938 A 2.0002 2.0002 0 1 0 25.414062 25.414062 L 39 11.828125 L 39 20 A 2.0002 2.0002 0 1 0 43 20 L 43 7.2460938 A 2.0002 2.0002 0 0 0 40.960938 4.9804688 z M 12.5 8 C 8.3826878 8 5 11.382688 5 15.5 L 5 35.5 C 5 39.617312 8.3826878 43 12.5 43 L 32.5 43 C 36.617312 43 40 39.617312 40 35.5 L 40 26 A 2.0002 2.0002 0 1 0 36 26 L 36 35.5 C 36 37.446688 34.446688 39 32.5 39 L 12.5 39 C 10.553312 39 9 37.446688 9 35.5 L 9 15.5 C 9 13.553312 10.553312 12 12.5 12 L 22 12 A 2.0002 2.0002 0 1 0 22 8 L 12.5 8 z"></path>
+</svg></a></td>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Dummy data for the line chart
+    const ctx = document.getElementById('growthChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['24h', '23h', '22h', '21h', '20h', '19h', '18h', '17h', '16h', '15h', '14h', '13h', '12h', '11h', '10h', '9h', '8h', '7h', '6h', '5h', '4h', '3h', '2h', '1h'],
+            datasets: [{
+                label: 'Clients',
+                data: {{ clientGroth24h }},
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 2,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Hours Ago'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Client Count'
+                    },
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+{% endblock content %}
+

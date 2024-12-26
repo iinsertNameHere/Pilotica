@@ -1,0 +1,21 @@
+:root {
+    --light-gray: #464545;
+    --gray: #2F2F2F;
+    --dark-gray: #1B1B1B;
+    --orange: #F54703;
+    --light-orange: #FF7518;
+    --red: #e5383b;
+    --yellow: #ffc849;
+    --blue: #667fc3;
+    --green: #3ea471;
+    --white: #fff;
+
+    --bg: var(--dark-gray);
+    --light-bg: var(--gray);
+    --outline: #4b4b4bd6; 
+
+    --danger: var(--red);
+    --warning: var(--yellow);
+    --info: var(--blue);
+    --success: var(--green);
+}
