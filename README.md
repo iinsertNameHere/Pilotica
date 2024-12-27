@@ -52,4 +52,4 @@ $ ./run.sh
 
 ### License
 
->This Project is Licensed under the terms of [Apache-2.0 license](LICENCE)!
+>This Project is Licensed under the terms of [Apache-2.0 license](LICENSE)!
