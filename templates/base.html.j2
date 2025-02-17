@@ -22,12 +22,16 @@
     <!-- Top Bar -->
     <div class="row py-2 align-items-center top-bar">
       <div class="col-3 d-flex align-items-center">
+        {% if active == "BACK" and back_url %}
+        <a class="btn btn-outline-orange" href="{{ back_url }}">Back</a>
+        {% else %}
         <!-- Burger Menu -->
         <div class="burger-menu" id="burgerBtn">
           <div class="burger-line"></div>
           <div class="burger-line"></div>
           <div class="burger-line"></div>
         </div>
+        {% endif %}
       </div>
       <div class="col-6 text-center">
         <!-- Logo Image -->
@@ -39,6 +43,7 @@
       </div>
     </div>
 
+    {% if not back_url%}
     <!-- Dropdown Navigation Menu -->
     <div class="row nav-menu left" id="navMenu">
       <nav class="col">
@@ -57,6 +62,7 @@
         </ul>
       </nav>
     </div>
+    {% endif %}
 
     <!-- Dropdown Navigation Menu -->
     <div class="row nav-menu right" id="profileMenu">
@@ -90,29 +96,30 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     {% if user %}
-    const burgerBtn = document.getElementById('burgerBtn');
-    const navMenu = document.getElementById('navMenu');
 
-    burgerBtn.addEventListener('click', function () {
-      this.classList.toggle('open');
-      if (navMenu.style.height === '0px' || !navMenu.style.height) {
-        navMenu.style.height = navMenu.scrollHeight + 'px';
-      } else {
-        navMenu.style.height = '0px';
-      }
-    });
-
-    const profileBtn = document.getElementById('profileBtn');
-    const profileMenu = document.getElementById('profileMenu');
-
-    profileBtn.addEventListener('click', function () {
-      this.classList.toggle('open');
-      if (profileMenu.style.height === '0px' || !profileMenu.style.height) {
-        profileMenu.style.height = profileMenu.scrollHeight + 'px';
-      } else {
-        profileMenu.style.height = '0px';
-      }
-    });
+      {% if not back_url %}
+        const burgerBtn = document.getElementById('burgerBtn');
+        const navMenu = document.getElementById('navMenu');
+        burgerBtn.addEventListener('click', function () {
+          this.classList.toggle('open');
+          if (navMenu.style.height === '0px' || !navMenu.style.height) {
+            navMenu.style.height = navMenu.scrollHeight + 'px';
+          } else {
+            navMenu.style.height = '0px';
+          }
+        });
+      {% endif %}
+    
+      const profileBtn = document.getElementById('profileBtn');
+      const profileMenu = document.getElementById('profileMenu');
+      profileBtn.addEventListener('click', function () {
+        this.classList.toggle('open');
+        if (profileMenu.style.height === '0px' || !profileMenu.style.height) {
+          profileMenu.style.height = profileMenu.scrollHeight + 'px';
+        } else {
+          profileMenu.style.height = '0px';
+        }
+      });
     {% endif %}
   </script>
   {% block scripts %}

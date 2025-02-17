@@ -5,3 +5,5 @@ bcrypt
 sqlalchemy
 PyJWT
 pillow
+requests
+apscheduler

@@ -104,17 +104,16 @@
 
     // Add markers to the map based on location data
     ipLocations.forEach(location => {
-        const [name, lat, lng, count, ips] = location;
-        const size = getMarkerSize(count);
+        const size = getMarkerSize(location.count);
 
-        const marker = L.circleMarker([lat, lng], {
+        const marker = L.circleMarker([location.lat, location.lng], {
             color: 'orange',
             radius: size,
             fillOpacity: 0.5,
         }).addTo(map);
 
         // Bind a popup with location name and count
-        marker.bindPopup(`<strong>${name}</strong><br>Count: ${count}`);
+        marker.bindPopup(`<strong>${location.loc}</strong><br>Count: ${location.count}`);
     });
 
     // Initialize Chart.js for new clients graph
@@ -156,5 +155,6 @@
             }
         }
     });
+    fetch("/api/cig")
 </script>
 {% endblock scripts %}

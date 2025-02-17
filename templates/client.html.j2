@@ -1,0 +1,131 @@
+{% extends "base.html.j2" %}
+{% block title %}Client {{ client.id }}{% endblock title %}
+{% block content %}
+<style>
+    .task {
+        border: 2px solid var(--outline);
+        border-radius: 8px;
+        padding: 5px 10px;
+        margin-right: 10px;
+    }
+
+    .card-body-scrollable {
+        max-height: 400px; /* Adjust as needed to ensure a proper height */
+        overflow-y: auto;
+    }
+
+    .cookies-card {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .cookies-card .card-body {
+        flex: 1; /* Allow the card body to expand */
+        display: flex;
+        flex-direction: column;
+    }
+
+    .cookies-table-container {
+        flex: 1; /* Take the remaining space */
+        overflow-y: auto; /* Enable vertical scrolling */
+    }
+</style>
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header text-white" style="background-color: var(--blue);">Task Queue</div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap">
+                        <!-- Example Task -->
+                        <div class="task">
+                            <div>Task Name</div>
+                            <div style="font-size: 10; color: var(--light-gray)">uuid123</div>
+                        </div>
+                        <div class="task">
+                            <div>Task Name</div>
+                            <div style="font-size: 10; color: var(--light-gray)">uuid123</div>
+                        </div>
+                        <div class="task">
+                            <div>Task Name</div>
+                            <div style="font-size: 10; color: var(--light-gray)">uuid123</div>
+                        </div>
+                        <!-- Repeat for other tasks -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <!-- Left Column: Infos Card -->
+        <div class="col-md-4">
+            <div class="card mb-4 h-100">
+                <div class="card-header text-white" style="background-color: var(--light-orange);">Client #{{ client.id }}</div>
+                <div class="card-body">
+                    <h5 class="card-title">Infos</h5>
+                    <pre>
+HWID: {{ client.hwid }}
+Time/Date: {{ client.time }}
+IP: {{ client.ip }}
+                    </pre>
+                    <h5 class="card-title mt-2">Hardware</h5>
+                    <pre>
+Hostname: {{ client.hostname }}
+CPU: {{ client.cpu }}
+MAC: {{ client.mac }}
+                    </pre>
+                    <h5 class="card-title mt-2">Status</h5>
+                    <pre>
+Checked: {{ client.checked }}
+Online: {{ client.online }}
+Software: {{ client.software }}
+                    </pre>
+                    <h5 class="card-title mt-2">Downloads</h5>
+                    <div class="d-flex justify-content-start flex-wrap">
+                        <a href="/api/client/{{ client.id }}/cookies.txt" class="btn btn-outline-secondary m-1">cookies.txt</a>
+                        <a href="/api/client/{{ client.id }}/logins.txt" class="btn btn-outline-secondary m-1">logins.txt</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Logins Card -->
+        <div class="col-md-8">
+            <div class="card mb-4 cookies-card">
+                <div class="card-header text-white" style="background-color: var(--green)">Logins</div>
+                <div class="card-body">
+                    <div class="cookies-table-container">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Site</th>
+                                    <th scope="col">Username</th>
+                                    <th scope="col">Password</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Example Row -->
+                                <tr>
+                                    <td>example.com</td>
+                                    <td>User123</td>
+                                    <td>MyPassword123#</td>
+                                </tr>
+                                <tr>
+                                    <td>example.com</td>
+                                    <td>User123</td>
+                                    <td>MyPassword123#</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock content %}

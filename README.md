@@ -29,7 +29,7 @@
 * Add multiple users with premissions
 * Client geolocation map
 * Client task system
-* Write you own clients using the ClientAPI
+* Write you own clients using the ServiceAPI
 
 ## 🔥 Setup the server
 
