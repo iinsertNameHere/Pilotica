@@ -54,6 +54,11 @@
           <li class="nav-item">
             <a class="nav-link noselect text-white {% if active == 'clients' %}active{% endif %}" href="/clients">Clients</a>
           </li>
+          {% if premissions["Configurator"] in user.premissions or premissions["Operator"] in user.premissions or premissions["Admin"] in user.premissions %}
+          <li class="nav-item">
+            <a class="nav-link noselect text-white {% if active == 'tasks' %}active{% endif %}" href="/tasks">Tasks</a>
+          </li>
+          {% endif %}
           {% if premissions["Configurator"] in user.premissions or premissions["Admin"] in user.premissions %}
           <li class="nav-item">
             <a class="nav-link noselect text-white {% if active == 'settings' %}active{% endif %}" href="/settings">Settings</a>

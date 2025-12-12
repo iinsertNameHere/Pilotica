@@ -51,64 +51,33 @@ def generate_hwid(mac: str, hostname: str, cpu: str) -> str:
 
     return sha256_hash
 
-IP_GROUPS_FILE = "geolocs.log"
+def summarize_locations(locations):
+    city_map = {}
 
-def get_ip_groups():
-    try:
-        with open(IP_GROUPS_FILE, "r") as f:
-            data = f.read().strip()
-        parts = data.split("|")
-        if len(parts) < 2: return (None, "[]")
-        time = datetime.strptime(parts[0].strip(), "%d-%m-%Y %H:%M")
-        return (time, parts[1].strip())
-    except:
-        return (None, "[]")
+    for loc in locations:
+        if not loc: continue
+        country = loc.get("country")
+        city = loc.get("city")
+        key = (country, city)
 
-async def create_ip_groups(ip_list):
-    geo_api_url = "https://ipinfo.io/{}/json"  # Using ipinfo.io service for geolocation
-    location_groups = {}
+        if key not in city_map:
+            city_map[key] = {
+                "loc": f"{country}, {city}",
+                "lat": loc.get("lat"),
+                "lon": loc.get("lon"),
+                "count": 0
+            }
 
-    # BLock file by changing the time to be now + 365days
-    _, data = get_ip_groups()
-    with open(IP_GROUPS_FILE, "w") as f:
-        f.write((datetime.now() + timedelta(days=365)).strftime("%d-%m-%Y %H:%M") + " | " + data)
+        city_map[key]["count"] += 1
 
-    for ip in ip_list:
-        try:
-            response = requests.get(geo_api_url.format(ip))
-            response.raise_for_status()
-            geo_data = response.json()
-            
-            # Retrieve location info
-            city = geo_data.get('city', 'Unknown city')
-            country = geo_data.get('country', 'Unknown country')
-            location_key = f"{city}, {country}"
-            
-            # Retrieve latitude and longitude
-            loc = geo_data.get('loc', 'Unknown location').split(',')
-            latitude = loc[0] if len(loc) > 0 else 'Unknown latitude'
-            longitude = loc[1] if len(loc) > 1 else 'Unknown longitude'
-
-            # If location already exists, append the IP to the list of IPs for that location
-            if location_key not in location_groups:
-                location_groups[location_key] = {
-                    'lat': latitude,
-                    'long': longitude,
-                    'ips': [],
-                }
-            location_groups[location_key]['ips'].append(ip)
-            print(f"Fetched geolocation for: {ip}")
-        
-        except requests.RequestException as e:
-            print(f"Error fetching geolocation for IP {ip}: {e}")
-            break
-        
-        sleep(1.5)
-    
-    # Convert the location data to the required format [(Name, lat, long, count, ips)]
+    # convert mapping to list (and drop internal counter if not needed)
     result = []
-    for location, data in location_groups.items():
-        result.append({"loc": location, "lat": data['lat'],"lng": data['long'], "count": len(data['ips'])})
+    for data in city_map.values():
+        result.append({
+            "loc": data["loc"],
+            "lat": data["lat"],
+            "lon": data["lon"],
+            "count": data["count"]
+        })
 
-    with open(IP_GROUPS_FILE, "w") as f:
-        f.write(datetime.now().strftime("%d-%m-%Y %H:%M") + " | " + str(result))
+    return result

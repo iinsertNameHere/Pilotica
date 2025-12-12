@@ -38,20 +38,19 @@
                 <div class="card-header text-white" style="background-color: var(--blue);">Task Queue</div>
                 <div class="card-body">
                     <div class="d-flex flex-wrap">
-                        <!-- Example Task -->
-                        <div class="task">
-                            <div>Task Name</div>
-                            <div style="font-size: 10; color: var(--light-gray)">uuid123</div>
-                        </div>
-                        <div class="task">
-                            <div>Task Name</div>
-                            <div style="font-size: 10; color: var(--light-gray)">uuid123</div>
-                        </div>
-                        <div class="task">
-                            <div>Task Name</div>
-                            <div style="font-size: 10; color: var(--light-gray)">uuid123</div>
-                        </div>
-                        <!-- Repeat for other tasks -->
+                        {% if tasks %}
+                            {% for task in tasks %}
+                                <div class="task">
+                                    <div>{{ task.name }}</div>
+                                    <div style="font-size: 10; color: var(--light-gray)">{{ task.type }}</div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                             <div class="task" style="border: none">
+                                <div style="color: var(--light-gray)">No tasks in queue</div>
+                                <div style="color: var(--light-gray)">at the moment...</div>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -107,17 +106,13 @@ Software: {{ client.software }}
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Example Row -->
-                                <tr>
-                                    <td>example.com</td>
-                                    <td>User123</td>
-                                    <td>MyPassword123#</td>
-                                </tr>
-                                <tr>
-                                    <td>example.com</td>
-                                    <td>User123</td>
-                                    <td>MyPassword123#</td>
-                                </tr>
+                                {% for row in logins %}
+                                    <tr>    
+                                        <td>{{ row[0] }}</td>
+                                        <td>{{ row[1] }}</td>
+                                        <td>{{ row[2] }}</td>
+                                    </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>

@@ -99,14 +99,14 @@
 
     // Function to calculate marker size based on count
     function getMarkerSize(count) {
-        return 1 + Math.floor(count * 0.2); // 0.2px per IP
+        return 1 + Math.floor(count * 0.25); // 0.2px per IP
     }
 
     // Add markers to the map based on location data
     ipLocations.forEach(location => {
         const size = getMarkerSize(location.count);
 
-        const marker = L.circleMarker([location.lat, location.lng], {
+        const marker = L.circleMarker([location.lat, location.lon], {
             color: 'orange',
             radius: size,
             fillOpacity: 0.5,
@@ -155,6 +155,5 @@
             }
         }
     });
-    fetch("/api/cig")
 </script>
 {% endblock scripts %}

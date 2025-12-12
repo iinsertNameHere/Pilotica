@@ -33,7 +33,7 @@ async def login_action(request: Request):
 
     # Set the token in cookies
     response = redirect("/")
-    response.cookies["access_token"] = access_token
+    response.cookies.add_cookie("access_token", access_token, secure=False)
     return response
 
 @auth_bp.get("/logout")

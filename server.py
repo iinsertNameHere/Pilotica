@@ -8,7 +8,6 @@ from bcrypt import checkpw
 from lib.blueprints.api import api_bp
 from lib.blueprints.auth import auth_bp
 from lib.blueprints.ui import ui_bp
-from lib.misc import create_ip_groups
 from lib.models import Client, SessionLocal, User, init_db
 from sanic import Request, Sanic, redirect, response
 from sanic.exceptions import SanicException

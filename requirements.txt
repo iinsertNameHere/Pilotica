@@ -1,9 +1,9 @@
-sanic
-sanic-ext
-jinja2
-bcrypt
-sqlalchemy
-PyJWT
-pillow
+sanic==25.3.0
+sanic-ext==24.12.0
+Jinja2==3.1.6
+bcrypt==5.0.0
+SQLAlchemy==2.0.45
+PyJWT==2.10.1
+pillow==12.0.0
+APScheduler==3.11.1
 requests
-apscheduler
